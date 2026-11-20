@@ -1987,15 +1987,15 @@ R.algo = {
   lyr:{core:[10,100], range:[0,200], w:{edge:1, peak:.8, shore:.6}, kilde:['njff_lyr','hi_lyr','hk_lyr'], hvorfor:'stupbratte svaberg, topper, skjær og grunner; 40–100 m over steinbunn',
     mnd:{'11-3':{core:[60,200], w:{peak:1, edge:.6}}}},
   lange:{core:[100,400], range:[60,1000], w:{foot:1, peak:.6, edge:.4}, kilde:['njff_lange','hi_lange'], hvorfor:'100–400 m på ujevn bunn: topper, bakker og bunnen av skrenter'},
-  brosme:{core:[200,500], range:[50,1000], w:{edge:1, foot:.6}, kilde:['njff_brosme','hi_brosme'], hvorfor:'200–500 m over hardbunn i dype fjorder'},
+  brosme:{core:[100,500], range:[50,1000], w:{edge:1, foot:.6}, kilde:['njff_brosme','hi_brosme','snl_brosme'], hvorfor:'over hardbunn i dype fjorder; stort sett 100–1000 m (SNL), algoritmen leter mest på 100–500 m'},
   lysing:{core:[70,150], range:[30,600], w:{neardeep:1, flat:.6}, kilde:['njff_lysing'], hvorfor:'flater og slakke bakker på 70–150 m nær dypere vann'},
   hvitting:{core:[30,150], range:[10,200], w:{flat:.6, basin:.5}, kilde:['njff_hvitting'], hvorfor:'30–150 m nær bunnen, helst mudderbunn'},
   hyse:{core:[50,300], range:[30,400], w:{flat:.6, basin:.5}, kilde:['snl_hyse','hi_hyse'], hvorfor:'50–300 m over bløt bunn'},
   piggskate:{core:[20,300], range:[10,400], w:{flat:.6, basin:.4}, kilde:['snl_piggskate','njff_salt'], hvorfor:'bløtbunn på 20–300 m'},
   uer:{core:[100,500], range:[60,800], w:{edge:1, foot:.4, peak:.4}, kilde:['snl_uer'], hvorfor:'langs bratte skråninger eller fritt i vannmassene på 100–500 m', truet:true},
   kveite:{core:[10,50], range:[5,150], w:{peak:.8, edge:.8, flat:.3}, kilde:['hk_kveite','aof_kveite'], hvorfor:'grunne topper, bakker og renner mot dypere vann (10–50 m) vår–høst', n62:true, stengt:[[12,20],[4,20]]},
-  taskekrabbe:{core:[10,30], range:[0,50], w:{shore:1}, kilde:['snl_taskekrabbe'], hvorfor:'ca. 10–30 m nær land vår og sommer, dypere om vinteren (kilden gir ikke tall for vinteren; algoritmen bruker da 20–60 m)',
-    mnd:{'12-3':{core:[20,60], range:[10,100], w:{shore:.3}}}},
+  taskekrabbe:{core:[10,30], range:[0,50], w:{shore:1}, kilde:['snl_taskekrabbe','hi_taskekrabbe'], hvorfor:'ca. 10–30 m nær land vår og sommer, om vinteren ca. 30–50 m (HI)',
+    mnd:{'12-3':{core:[30,50], range:[10,100], w:{shore:.3}}}},
   hummer:{core:[5,40], range:[2,60], w:{shore:.8, edge:.6}, kilde:['snl_hummer'], hvorfor:'mest 5–40 m på steinbunn med tare og gjemmesteder; vandrer lite', sesong:true}
 };
 R.algoUt = 'Makrell (står i de frie vannmassene), blåkveite og kongekrabbe (Nord-Norge), steinbit og breiflabb (for lite presis kunnskap om foretrukket dyp) er ikke med. Fredede og truede arter vises med varsel, slik at du kan lære hvor de står.';
@@ -3813,7 +3813,10 @@ function depthFit(d, P){
    10 m per bildepunkt (ca. 5 m på 60° N – der Kartverkets dybdelag slutter å vise nye detaljer) og lagres.
    Samme sted får derfor alltid samme poeng: forslagene flytter seg ikke når du zoomer. Zoomer du inn, kan
    flere forslag dukke opp i utsnittet, men de du allerede ser, blir liggende. */
-const ALV = 'a11', ACELL = 10, ATILE = 6000, AMAXT = 24, AKEEP = 8;
+/* terskler for bunnformene (meter, høydeforskjell innen ca. 120 m): kant 15–90 m, flat under 8 m (helt) til 48 m (ikke), slak bakke 5–60 m;
+   topp, liten topp og grop måles mot bunnen ca. 400 m unna. Kalibrert slik at antall forslag holder seg som før dybden mellom kurvene kom inn. */
+const FCFG = {e0: 15, e1: 75, pk: 30, kn: 10, bs: 30, fo: 8, fl: 40, s0: 5, s1: 10, s2: 35, s3: 25};
+const ALV = 'a12', ACELL = 10, ATILE = 6000, AMAXT = 24, AKEEP = 8;
 const ATC = new Map(), ATP = new Map(), AVER = new Map();
 (function(){ try { const o = JSON.parse(localStorage.getItem('fg_alg') || 'null'); if (o && o.v === ALV) o.t.forEach(t => ATC.set(t.k, t)); } catch(e){} })();
 let atSaveT = null;
@@ -3835,6 +3838,47 @@ function atGet(tx, ty, m){
   const k = tkey(tx, ty, m); if (ATC.has(k)) return Promise.resolve(ATC.get(k)); if (ATP.has(k)) return ATP.get(k);
   const pr = atCompute(tx, ty, m).then(t => { ATC.set(k, t); ATP.delete(k); atSave(); return t; }, e => { ATP.delete(k); throw e; });
   ATP.set(k, pr); return pr;
+}
+/* Dybde mellom dybdekurvene (interpolasjon).
+   Kartverket gir bare dybdeintervaller (f.eks. 30–40 m). For hver celle måles avstanden til nærmeste grunnere intervall
+   (eller land) og nærmeste dypere intervall, og dybden anslås lineært mellom de to kurvene. Regnes på et grovere rutenett
+   (f ganger f celler) for fart, og holdes alltid innenfor cellens eget intervall. */
+function interpDepth(DA, DB, LAND, W, H, cellM, f){
+  f = f || 2;
+  const W2 = Math.ceil(W / f), H2 = Math.ceil(H / f), N2 = W2 * H2, INF = 1e9, R = Math.max(4, Math.round(600 / (cellM * f)));
+  /* grovt rutenett: verdien i cellen øverst til venstre i hver blokk */
+  const a2 = new Float32Array(N2), b2 = new Float32Array(N2), l2 = new Uint8Array(N2);
+  for (let j = 0; j < H2; j++) for (let i = 0; i < W2; i++){ const c = Math.min(H - 1, j * f) * W + Math.min(W - 1, i * f), k = j * W2 + i; a2[k] = DA[c]; b2[k] = DB[c]; l2[k] = LAND[c]; }
+  const lv = new Set(); for (let k = 0; k < N2; k++) if (b2[k] > 0){ lv.add(a2[k]); lv.add(b2[k]); }
+  const dist = new Float32Array(N2), dU = new Float32Array(N2).fill(R), dL = new Float32Array(N2).fill(R), S2 = Math.SQRT2;
+  const chamfer = () => {
+    for (let j = 0; j < H2; j++){ const r = j * W2; for (let i = 0; i < W2; i++){ const c = r + i; let d = dist[c]; if (d === 0) continue;
+      if (i > 0 && dist[c - 1] + 1 < d) d = dist[c - 1] + 1;
+      if (j > 0){ const u = c - W2; if (dist[u] + 1 < d) d = dist[u] + 1; if (i > 0 && dist[u - 1] + S2 < d) d = dist[u - 1] + S2; if (i < W2 - 1 && dist[u + 1] + S2 < d) d = dist[u + 1] + S2; }
+      dist[c] = d; } }
+    for (let j = H2 - 1; j >= 0; j--){ const r = j * W2; for (let i = W2 - 1; i >= 0; i--){ const c = r + i; let d = dist[c]; if (d === 0) continue;
+      if (i < W2 - 1 && dist[c + 1] + 1 < d) d = dist[c + 1] + 1;
+      if (j < H2 - 1){ const u = c + W2; if (dist[u] + 1 < d) d = dist[u] + 1; if (i < W2 - 1 && dist[u + 1] + S2 < d) d = dist[u + 1] + S2; if (i > 0 && dist[u - 1] + S2 < d) d = dist[u - 1] + S2; }
+      dist[c] = d; } }
+  };
+  for (const L of lv){
+    let any = false; for (let k = 0; k < N2; k++) if (b2[k] > 0 && a2[k] === L){ any = true; break; }
+    if (any){ /* øvre kurve for celler som starter på L: avstand til celler som er grunnere enn L, eller land */
+      let seeds = 0; for (let k = 0; k < N2; k++){ const s = l2[k] || (b2[k] > 0 && b2[k] <= L); dist[k] = s ? 0 : INF; if (s) seeds++; }
+      if (seeds){ chamfer(); for (let k = 0; k < N2; k++) if (b2[k] > 0 && a2[k] === L) dU[k] = Math.min(R, dist[k]); } }
+    any = false; for (let k = 0; k < N2; k++) if (b2[k] === L){ any = true; break; }
+    if (any){ /* nedre kurve for celler som slutter på L: avstand til celler som er dypere enn L */
+      let seeds = 0; for (let k = 0; k < N2; k++){ const s = b2[k] > 0 && a2[k] >= L; dist[k] = s ? 0 : INF; if (s) seeds++; }
+      if (seeds){ chamfer(); for (let k = 0; k < N2; k++) if (b2[k] === L) dL[k] = Math.min(R, dist[k]); } }
+  }
+  /* full oppløsning: brøk fra det grove rutenettet, men alltid innenfor cellens eget intervall */
+  const Z = new Float32Array(W * H).fill(NaN);
+  for (let j = 0; j < H; j++) for (let i = 0; i < W; i++){ const c = j * W + i, a = DA[c], b = DB[c]; if (!(b > 0)) continue;
+    const k = ((j / f) | 0) * W2 + ((i / f) | 0);
+    let t = .5; if (a2[k] === a && b2[k] === b){ const u = dU[k], l = dL[k]; t = u >= R && l >= R ? .5 : (u + .5) / (u + l + 1); }
+    else if (b2[k] > 0) t = b2[k] <= a ? .1 : a2[k] >= b ? .9 : .5; else if (l2[k]) t = .1;
+    Z[c] = a + (b - a) * t; }
+  return Z;
 }
 /* smale sund: sjøpunkter med land på begge sider innen kort avstand, der vannet åpner seg igjen i begge ender langs sundet.
    LA = landmaske (1 = land), step = meter per rute, m0/nIn = rutas indre del. Gir s (0–255, smalere = høyere) og w (bredde i tiere av meter).
@@ -3872,20 +3916,25 @@ async function atCompute(tx, ty, m){
   const LC = 40, mL = Math.ceil(2300 / (LC * cosL)), nL = ATILE / LC + 2 * mL, bl = [x0 - mL * LC, y0 - mL * LC, x1 + mL * LC, y1 + mL * LC];
   const sw = unmerc(bx[0], bx[1]), ne = unmerc(bx[2], bx[3]), lb = Lf.latLngBounds(sw, ne);
   const wfs = (svc, typ) => wfsBounds(svc, typ, lb).catch(() => null);
-  const [dd, bd, ld, akF, akP, pasF] = await Promise.all([wmsImg(DYB + q(bx, W, H) + '&layers=Dybdelag', W, H), wmsImg(NGU + q(bx, W, H) + '&layers=NiN_DK_Det', W, H).catch(() => null),
-    wmsImg(NMG + q(bl, nL, nL) + '&layers=Landareal', nL, nL).catch(() => null), wfs('FiskeridirWFS_akva', 'Flate_ihht_Akvakulturregisteret'), wfs('FiskeridirWFS_akva', 'akvakultur_lokaliteter'), wfs('FiskeridirWFS_fiskeri', 'fiskeplasser_passive_redskap')]);
+  const [dd, bd, ld, akF, akP, pasF, dl] = await Promise.all([wmsImg(DYB + q(bx, W, H) + '&layers=Dybdelag', W, H), wmsImg(NGU + q(bx, W, H) + '&layers=NiN_DK_Det', W, H).catch(() => null),
+    wmsImg(NMG + q(bl, nL, nL) + '&layers=Landareal', nL, nL).catch(() => null), wfs('FiskeridirWFS_akva', 'Flate_ihht_Akvakulturregisteret'), wfs('FiskeridirWFS_akva', 'akvakultur_lokaliteter'), wfs('FiskeridirWFS_fiskeri', 'fiskeplasser_passive_redskap'),
+    wmsImg(DYB + q(bl, nL, nL) + '&layers=Dybdelag', nL, nL).catch(() => null)]);
   const N = W * H, D = new Float32Array(N).fill(NaN), DA = new Float32Array(N), DB = new Float32Array(N), LAND = new Uint8Array(N), BT = new Uint8Array(N);
   for (let c = 0; c < N; c++){ const k = c * 4;
     if (dd[k + 3] > 200){ const iv = depthOf(dd[k]); if (iv){ DA[c] = iv[0]; DB[c] = iv[1]; D[c] = (iv[0] + iv[1]) / 2; } } else LAND[c] = 1;
     if (bd && bd[k + 3] > 200 && !isNaN(D[c])) BT[c] = bunnOf(bd[k], bd[k + 1], bd[k + 2]); }
-  /* tomt i dybdekartet = land, men bare innen ca. 1 km fra Kartverkets landareal – ellers mangler det bare dybdedata */
-  let LA = null; const offL = mL * LC - mC * ACELL;
+  /* tomt i dybdekartet = land, men bare innen ca. 5 km fra Kartverkets landareal – ellers mangler det bare dybdedata.
+     Landarealet er forenklet og mangler mange øyer, så selve kystlinjen kommer fra dybdekartet. */
+  let LA = null, LND = null; const offL = mL * LC - mC * ACELL;
   if (ld){ LA = new Uint8Array(nL * nL); for (let c = 0; c < nL * nL; c++) if (ld[c * 4 + 3] > 40) LA[c] = 1;
-    const A = dilate(LA, nL, nL, Math.max(1, Math.round(1000 / (LC * cosL)))), off = offL;
+    const A = dilate(LA, nL, nL, Math.max(1, Math.round(5000 / (LC * cosL))));
     for (let j = 0; j < H; j++) for (let i = 0; i < W; i++){ const c = j * W + i; if (!LAND[c]) continue;
-      const ci = Math.floor((off + (i + .5) * ACELL) / LC), cj = Math.floor((off + (j + .5) * ACELL) / LC); if (!A[cj * nL + ci]) LAND[c] = 0; } }
-  /* smale sund (der tidevannsstrømmen ofte går sterkere): på landarealets rutenett */
-  const SU = LA ? sundGrid(LA, nL, LC * cosL, mL, ATILE / LC) : null;
+      const ci = Math.floor((offL + (i + .5) * ACELL) / LC), cj = Math.floor((offL + (j + .5) * ACELL) / LC); if (!A[cj * nL + ci]) LAND[c] = 0; }
+    if (dl){ LND = new Uint8Array(nL * nL); for (let c = 0; c < nL * nL; c++) if (dl[c * 4 + 3] <= 200 && A[c]) LND[c] = 1; } }
+  /* smale sund (der tidevannsstrømmen ofte går sterkere): på et grovere rutenett med 2,3 km kant */
+  const SU = (LND || LA) ? sundGrid(LND || LA, nL, LC * cosL, mL, ATILE / LC) : null;
+  /* dybden mellom dybdekurvene (i stedet for midten av intervallet) */
+  { const Z = interpDepth(DA, DB, LAND, W, H, cellM, 2); for (let c = 0; c < N; c++) if (!isNaN(D[c])) D[c] = Z[c]; }
   /* nabopunkter som faste forskyvninger (marginen er større enn største radius, så ingen grensesjekk trengs) */
   const rr = mt => Math.max(1, Math.round(mt / cellM)), r1 = rr(120), r2 = rr(400), r3 = rr(600), r4 = rr(100), r5 = rr(300);
   const dirs = Array.from({length: 16}, (_, a) => [Math.cos(a * Math.PI / 8), Math.sin(a * Math.PI / 8)]);
@@ -3902,13 +3951,13 @@ async function atCompute(tx, ty, m){
     let nd = 0; for (let a = 0; a < O3.length; a++){ const v = D[c + O3[a]]; if (v === v && v >= d + 50){ nd = 1; break; } }
     let sh = 0; for (let a = 0; a < O4.length; a++) if (isLand(c + O4[a])){ sh = 1; break; }
     if (!sh) for (let a = 0; a < 16; a++) if (isLand(c + O5[a])){ sh = .5; break; }
-    const nr = n2 + nl, edge = clamp01((Sd - 25) / 120), ringMean = n2 ? sum2 / n2 : d, frac = nr ? deeper / nr : 0, fracS = nr ? shallower / nr : 0, top = edge * clamp01((mx - d) / Math.max(1, Sd));
+    const K = FCFG, nr = n2 + nl, edge = clamp01((Sd - K.e0) / K.e1), ringMean = n2 ? sum2 / n2 : d, frac = nr ? deeper / nr : 0, fracS = nr ? shallower / nr : 0, top = edge * clamp01((mx - d) / Math.max(1, Sd));
     fe.mn = mn; fe.mx = mx; fe.edge = edge; fe.foot = edge * clamp01((d - mn) / Math.max(1, Sd)); fe.top = top;
-    fe.peak = nr >= 12 ? clamp01((frac - .6) / .4) * clamp01((ringMean - d) / 30) : 0;
-    fe.knoll = nr >= 12 ? clamp01((frac - .6) / .4) * clamp01((ringMean - d) / 10) : 0;   /* liten topp: 10 m grunnere enn rundt gir full score */
+    fe.peak = nr >= 12 ? clamp01((frac - .6) / .4) * clamp01((ringMean - d) / K.pk) : 0;
+    fe.knoll = nr >= 12 ? clamp01((frac - .6) / .4) * clamp01((ringMean - d) / K.kn) : 0;   /* liten topp: få meter grunnere enn rundt */
     fe.nose = top * clamp01((frac - .45) / .25);                                         /* nebb/odde: kant med dypere vann på flere sider */
-    fe.basin = nr >= 12 ? clamp01((fracS - .6) / .4) * clamp01((d - ringMean) / 30) : 0; fe.flat = 1 - clamp01(Sd / 30); fe.neardeep = nd; fe.shore = sh;
-    fe.slake = clamp01((Sd - 5) / 10) * (1 - clamp01((Sd - 35) / 25));                  /* slak bakke: jevn helning, verken flat eller bratt */
+    fe.basin = nr >= 12 ? clamp01((fracS - .6) / .4) * clamp01((d - ringMean) / K.bs) : 0; fe.flat = 1 - clamp01((Sd - K.fo) / K.fl); fe.neardeep = nd; fe.shore = sh;
+    fe.slake = clamp01((Sd - K.s0) / K.s1) * (1 - clamp01((Sd - K.s2) / K.s3));        /* slak bakke: jevn helning, verken flat eller bratt */
     if (SU){ const ci = Math.floor((offL + (c % W + .5) * ACELL) / LC), cj = Math.floor((offL + (((c / W) | 0) + .5) * ACELL) / LC), k = cj * nL + ci; fe.sund = SU.s[k] / 255; fe.sundW = SU.w[k] * 10; } else { fe.sund = 0; fe.sundW = 0; }
     fe.ringMean = ringMean; fe.d0 = d; fe.bt = BT[c]; fe.ov = ov; return true;
   }
@@ -3923,16 +3972,18 @@ async function atCompute(tx, ty, m){
     const row = (j + mC) * W + mC, bj = ((j / BS) | 0) * nb;
     for (let i = 0; i < n; i++){ const c = row + i; if (!feat(c, fe)) continue; nD++; if (fe.bt) nB++;
       const d = fe.d0, wide = DB[c] - DA[c] > 100, bi = bj + ((i / BS) | 0);
-      for (let s = 0; s < sps.length; s++){ const X = sps[s], fit = depthFit(d, X.P); if (fit <= 0) continue;
-        let v = .15; for (let a = 0; a < X.w.length; a++) v += X.w[a][1] * fe[X.w[a][0]];
-        const bm = X.bu && fe.bt ? (X.bu.pref.indexOf(fe.bt) >= 0 || (X.bu.overgang && fe.ov) ? 1.2 : X.bu.avoid && X.bu.avoid.indexOf(fe.bt) >= 0 ? .6 : .9) : 1;
-        let sc = fit * v / (.15 + X.wsum) * bm; if (X.bo) for (let a = 0; a < X.bo.length; a++) sc *= 1 + X.bo[a][1] * fe[X.bo[a][0]]; if (wide) sc *= .6; sc += .03 * (1 - clamp01(Math.abs(d - X.mid) / X.half));
-        if (sc > bestS[s][bi]){ bestS[s][bi] = sc; bestC[s][bi] = c; } } }
+      for (let s = 0; s < sps.length; s++){ const sc = cellScore(sps[s], fe, d, wide); if (sc > bestS[s][bi]){ bestS[s][bi] = sc; bestC[s][bi] = c; } } }
   }
+  /* testkrok: høyeste poeng og bunnformer innenfor gitte sirkler (brukes bare av testene) */
+  const DBG = window.__fgdbg; if (DBG && DBG.t){ const s = sps.findIndex(X => X.sp === DBG.sp); if (s >= 0) DBG.t.forEach((t, k) => { const [px, py] = merc(t[0], t[1]), rc = t[2] / cellM;
+    const ci = (px - bx[0]) / ACELL, cj = (bx[3] - py) / ACELL; const o = DBG.out[k] = DBG.out[k] || {sc: -1};
+    for (let j = Math.max(mC, Math.floor(cj - rc)); j <= Math.min(mC + n - 1, Math.ceil(cj + rc)); j++) for (let i = Math.max(mC, Math.floor(ci - rc)); i <= Math.min(mC + n - 1, Math.ceil(ci + rc)); i++){
+      if (Math.hypot(i - ci, j - cj) > rc) continue; const c = j * W + i, f2 = {}; if (!feat(c, f2)) continue; const sc = cellScore(sps[s], f2, f2.d0, DB[c] - DA[c] > 100);
+      if (sc > o.sc){ o.sc = sc; o.fe = f2; o.iv = [DA[c], DB[c]]; } } }); }
   const ll = c => { const i = c % W, j = (c / W) | 0; return unmerc(bx[0] + (i + .5) * ACELL, bx[3] - (j + .5) * ACELL); };
   const ak = (akF || []).concat(akP || []), minSep = Math.round(350 / cellM), out = {};
   sps.forEach((X, s) => {
-    const cand = []; for (let b = 0; b < nb * nb; b++) if (bestS[s][b] >= .45) cand.push([bestS[s][b], bestC[s][b]]);
+    const cand = [], thr = DBG && DBG.thr != null ? DBG.thr : .45; for (let b = 0; b < nb * nb; b++) if (bestS[s][b] >= thr) cand.push([bestS[s][b], bestC[s][b]]);
     cand.sort((a, b) => b[0] - a[0] || a[1] - b[1]);
     const picked = [];
     for (const [sc, c] of cand){ if (picked.length >= AKEEP) break; const i = c % W, j = (c / W) | 0;
@@ -3948,6 +3999,14 @@ async function atCompute(tx, ty, m){
     if (picked.length) out[X.sp] = picked;
   });
   return {k: tkey(tx, ty, m), ts: Date.now(), nD, nB, c: out};
+}
+/* poeng for én celle og én art: dybdekrav × bunnformer × bunntype, pluss bonuser */
+function cellScore(X, fe, d, wide){
+  const fit = depthFit(d, X.P); if (fit <= 0) return 0;
+  let v = .15; for (let a = 0; a < X.w.length; a++) v += X.w[a][1] * fe[X.w[a][0]];
+  const bm = X.bu && fe.bt ? (X.bu.pref.indexOf(fe.bt) >= 0 || (X.bu.overgang && fe.ov) ? 1.2 : X.bu.avoid && X.bu.avoid.indexOf(fe.bt) >= 0 ? .6 : .9) : 1;
+  let sc = fit * v / (.15 + X.wsum) * bm; if (X.bo) for (let a = 0; a < X.bo.length; a++) sc *= 1 + X.bo[a][1] * fe[X.bo[a][0]]; if (wide) sc *= .6;
+  return sc + .03 * (1 - clamp01(Math.abs(d - X.mid) / X.half));
 }
 /* velg forslagene i utsnittet: felles utvalg på tvers av rutene, så kontroll av dybden hos Kartverket */
 async function algoPick(b, m, list, K, run){
@@ -4166,7 +4225,7 @@ $('#q').addEventListener('keydown', e => {
 document.addEventListener('keydown', e => { if (e.key === '/' && document.activeElement !== $('#q') && !/input|select|textarea/i.test(document.activeElement.tagName)){ e.preventDefault(); $('#q').focus(); } });
 render();
 /* lesetilgang for feilsøking og tester (endrer ingenting) */
-window.fg = {maps: () => ({map, map2}), algo: () => AL.res.map(r => ({sp: r.sp, lat: r.lat, lon: r.lon, sc: r.sc, rank: r.rank, fe: r.fe})), sund: sundGrid, ppos: k => { const m = PFMAP[k] && PFMAP[k](); return m && m._pf ? profPos(m._pf) : null; }, geo: GEO, note: () => AL.note, tiles: () => ATC.size, busy: () => AL.busy, run: () => AL.run};
+window.fg = {maps: () => ({map, map2}), algo: () => AL.res.map(r => ({sp: r.sp, lat: r.lat, lon: r.lon, sc: r.sc, rank: r.rank, fe: r.fe})), sund: sundGrid, interp: interpDepth, fcfg: c => c ? Object.assign(FCFG, c) : FCFG, clearTiles: () => { ATC.clear(); AVER.clear(); try { localStorage.removeItem('fg_alg'); } catch(e){} }, ppos: k => { const m = PFMAP[k] && PFMAP[k](); return m && m._pf ? profPos(m._pf) : null; }, geo: GEO, note: () => AL.note, tiles: () => ATC.size, busy: () => AL.busy, run: () => AL.run};
 })();
 
 </script>
