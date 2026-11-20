@@ -597,6 +597,11 @@ ol.ksteps{margin:8px 0 4px 14px}
 .pchart .pland{fill:rgba(160,120,70,.55)}.pchart .pnod{fill:rgba(160,160,160,.18)}
 .pchart .pab{fill:var(--text);font-size:12px;font-weight:800}
 .pstat{display:flex;gap:6px 16px;flex-wrap:wrap;font-size:13px;margin-top:4px}
+.pchart .ppos line{stroke:#f2c14e;stroke-width:2;stroke-dasharray:5 4}
+.pchart .ppos circle{fill:#f2c14e;stroke:#0d1b24;stroke-width:1.5}
+.pchart .ppos path{fill:#f2c14e}
+.pchart .ppos text{fill:#f2c14e;font-size:12px;font-weight:800}
+.pstat .pme{color:#f2c14e}.pstat .pme b{color:#f2c14e}
 </style>
 <style>
 :root{
@@ -876,9 +881,6 @@ body.mapbig{overflow:hidden}
 .mapmsg{position:absolute;left:12px;right:12px;bottom:30px;z-index:800;background:rgba(9,17,23,.94);border:1px solid #2f4350;border-radius:12px;padding:12px 14px;font-size:14px}
 .mapmsg b.t{display:block;margin-bottom:4px}
 .leaflet-container a{color:#0b6b8a}
-.posbar{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin-bottom:12px}
-.posbar h2{font-size:22px;margin:0;font-weight:800}
-.posbar .muted{color:var(--muted);font-size:14px}
 .ncards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .nc{background:var(--card);border-radius:14px;padding:12px 14px;min-width:0}
 .nc small{display:block;color:var(--muted);font-weight:800;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
@@ -957,7 +959,7 @@ body.mapbig{overflow:hidden}
     </header>
     <nav class="nav" id="nav" aria-label="Seksjoner"></nav>
     <main id="app"></main>
-    <div class="foot">Regler, biologi og priser er kontrollert mot kildene under «Kilder» (sist 17.11.2026). Live-data: MET Norway og Kartverket (CC BY 4.0), bølgeperiode fra Open-Meteo (CC BY 4.0), fiskeplasser og oppdrett fra Fiskeridirektoratet. Sjøkart © Kartverket. Fiskeridirektoratets regler gjelder – sjekk fiskeridir.no før du drar, og bruk godkjente sjøkart til navigasjon.</div>
+    <div class="foot">Regler og biologi er kontrollert mot kildene under «Kilder» (sist 17.11.2026). Live-data: MET Norway og Kartverket (CC BY 4.0), bølgeperiode fra Open-Meteo (CC BY 4.0), fiskeplasser og oppdrett fra Fiskeridirektoratet. Sjøkart © Kartverket. Fiskeridirektoratets regler gjelder – sjekk fiskeridir.no før du drar, og bruk godkjente sjøkart til navigasjon.</div>
   </div>
 </div>
 <script>
@@ -970,7 +972,7 @@ body.mapbig{overflow:hidden}
 </script>
 <script>
 /* ===== Data for Fiskeguide – virkeligheten =====
-   R  = regler, biologi, priser, sesonger og råd, med kilde-id (se SRC).
+   R  = regler, biologi, sesonger og råd, med kilde-id (se SRC).
    Merking: k = kildesjekket, e = erfaring/allmenn kunnskap (ikke kildesjekket her),
             r = lov/regel med kilde. */
 
@@ -1010,13 +1012,7 @@ const SRC = {
   hilyr: ['Havforskningsinstituttet: høringssvar om minstemål for lyr (2025)', 'https://www.fiskeridir.no/hoeringer/forslag-om-innforing-av-minstemal-for-lyr/_/attachment/inline/c35c1a71-1506-4003-acbe-4ee4fcbbb782:7b5aae1d48f186f50ea57b22f61b57ff53b79e06/Havforskningsinstituttet.pdf'],
   uerlarver: ['Eldre toktrapport om uer: larveslipp for vanlig uer slutten av april–juni', 'https://www.vliz.be/imisdocs/publications/ocrd/274798.pdf'],
   leppe: ['Fiskeridirektoratet, reguleringsmøtet sak 19/2025: Leppefisk', 'https://www.fiskeridir.no/yrkesfiske/reguleringsmotet/reguleringsmote-november-2025/_/attachment/inline/ac3e787d-9d20-49e7-877d-f77eefe38282:5200211e2947d2b1b76360f15ad31c129e1f360c/sak-19-2025-leppefisk.pdf'],
-  raf26_34: ['Råfisklaget: gjennomsnittspriser uke 34 2026', 'https://rafisklaget.no/media/d43ir5zj/gjennomsnittspriser_34_2026.pdf'],
-  raf26_36: ['Råfisklaget: gjennomsnittspriser uke 36 2026', 'https://www.rafisklaget.no/media/cundt0ti/gjennomsnittspriser_36_2026.pdf'],
-  raf26_33: ['Råfisklaget: gjennomsnittspriser uke 33 2026', 'https://rafisklaget.no/media/3bgmbevi/gjennomsnittspriser_33_2026.pdf'],
   raf26_25: ['Råfisklaget: gjennomsnittspriser uke 25 2026', 'https://www.rafisklaget.no/media/awljmplw/gjennomsnittspriser_25_2026.pdf'],
-  raf26_17: ['Råfisklaget: gjennomsnittspriser uke 17 2026', 'https://www.rafisklaget.no/media/orqf3ou2/gjennomsnittspriser_17_2026.pdf'],
-  raf26_8: ['Råfisklaget: gjennomsnittspriser uke 8 2026', 'https://www.rafisklaget.no/media/43mf4k5e/gjennomsnittspriser_8_2026.pdf'],
-  raf25_44: ['Råfisklaget: gjennomsnittspriser uke 44 2025', 'https://www.rafisklaget.no/media/jxbpf44n/gjennomsnittspriser_uke_44_2025.pdf'],
   raf25_35: ['Råfisklaget: ukerapport uke 35 2025 (blåkveite 26.5–31.8)', 'https://www.rafisklaget.no/media/fmwla2yp/uke_35_2025.docx'],
   rafbk26: ['Råfisklaget: Kystfiskebåtenes direktefiske etter blåkveite 2026', 'https://rafisklaget.no/media/vfgpfo3z/oppsummering-av-kystfiskebaatenes-direktefiske-etter-blaakveite-2026-3.pdf'],
   ukestat: ['Fiskeridirektoratet: ukestatistikk 2026 (ferskfiskordningen fra 29. juni)', 'https://www.fiskeridir.no/statistikk-tall-og-analyse/data-og-statistikk-om-yrkesfiske/fangst/vekestatistikk-for-utvalgte-arter/_/attachment/inline/4dcc915f-0440-4ed8-8ce9-1bdaf4128825:8c69932575e2a09b8eae32b00db2977155aac9b7/veke%2020.pdf'],
@@ -1064,9 +1060,7 @@ R.sp = {
     metode:[{t:'Stang: pilk ved bunnen med 1–2 opphengere (gummimakk eller softbait) over. Rolige løft, la pilken synke tilbake.',k:'e'},
             {t:'Agn: reke, sild eller makrellfilet på paternoster nær bunnen.',k:'e'},
             {t:'Garn for torsk nord for 62° N skal ha minst 156 mm maskevidde.',k:'r',s:['j78']}],
-    kval:{t:'Torsk kan være stiv i 2–3 døgn etter død. Filetér før stivheten setter inn eller etter at den har sluppet.',k:'k',s:['nofima']},
-    pris:[{t:'Hittil i 2026: torsk under 1 kg, sløyd uten hode, ca. 77–85 kr/kg (samme periode 2025: ca. 53–58 kr/kg).',k:'k',s:['raf26_34','raf26_8']},
-          {t:'2025 til og med uke 44: torsk 2,5 kg og større, sløyd uten hode, snitt 73,78 kr/kg (2024: 53,03). Delt på omregningsfaktoren 1,5 blir det ca. 49 kr/kg rund.',k:'k',s:['raf25_44']}]
+    kval:{t:'Torsk kan være stiv i 2–3 døgn etter død. Filetér før stivheten setter inn eller etter at den har sluppet.',k:'k',s:['nofima']}
   },
   hyse:{
     kjenn:[{t:'Stor svart flekk på siden under første ryggfinne, mørk sidelinje og overbitt munn. Mørk til gråfiolett rygg, sølvgrå sider og hvit buk.',k:'k',s:['snl_hyse']}],
@@ -1078,8 +1072,7 @@ R.sp = {
           {t:'Myk munn: rolig drill og jevn innsveiving.',k:'e'}],
     metode:[{t:'Paternoster med 2–3 små kroker agnet med reke, sild eller blåskjell.',k:'e'},
             {t:'Små pilker og opphengere fungerer når hysa står tett.',k:'e'}],
-    kval:{t:'Hyse stresses lett og kan bli stiv raskt. Bløgg straks og kjøl ned.',k:'k',s:['nofima']},
-    pris:[{t:'Hittil i 2026: hyse 0,98 kg og større, sløyd med hode, ca. 27,7 kr/kg (2025: 19,2). Hyse 1,1+ kg rund ca. 22 kr/kg.',k:'k',s:['raf26_36','raf26_8']}]
+    kval:{t:'Hyse stresses lett og kan bli stiv raskt. Bløgg straks og kjøl ned.',k:'k',s:['nofima']}
   },
   sei:{
     kjenn:[{t:'Mørk grønngrå rygg, lys og rett sidelinje, underkjeven stikker litt frem; liten eller ingen skjeggtråd.',k:'e'}],
@@ -1092,8 +1085,7 @@ R.sp = {
           {t:'Strømrike nes og sund. Stimen står ofte midt i vannsøylen.',k:'e'}],
     metode:[{t:'Pilk eller shad i midtvannet med raskt innsveiv; makrellslo og opphengere på småsei.',k:'e'},
             {t:'Minstemålet gjelder ikke sei som ikke skal selges (§ 48).',k:'r',s:['j78']}],
-    kval:{t:'Torsk, hyse og sei bør bløgges levende og blø ut i vann før kjøling.',k:'k',s:['nofimausloyd']},
-    pris:[{t:'Hittil i 2026: sei 3,1 kg og større, rund, ca. 23 kr/kg (2025: ca. 16). Sei 2,3+ kg sløyd uten hode ca. 30 kr/kg.',k:'k',s:['raf26_36']}]
+    kval:{t:'Torsk, hyse og sei bør bløgges levende og blø ut i vann før kjøling.',k:'k',s:['nofimausloyd']}
   },
   lyr:{
     kjenn:[{t:'Mørk sidelinje som bøyer kraftig over brystfinnen (hos sei er den rett og lys), tydelig underbitt og bronse- til olivenbrun farge.',k:'e'}],
@@ -1105,8 +1097,7 @@ R.sp = {
           {t:'Står gjerne et stykke over bunnen. Sveiv shaden opp gjennom vannsøylen.',k:'e'}],
     metode:[{t:'Jigghode med shad, sluk eller lett pilk. Kastefiske fra land på sommerkvelder.',k:'e'},
             {t:'Ingen minstemål ennå, men Havforskningsinstituttet anbefaler 50 cm, og Fiskeridirektoratet hørte i 2025 et forslag om 45 cm fra 2026.',k:'k',s:['hilyr','j78']}],
-    kval:{t:'Som annen torskefisk: bløgg levende, blø ut i kaldt vann og kjøl ned.',k:'k',s:['nofima']},
-    pris:[{t:'Hittil i 2026: lyr 1–2 kg sløyd uten hode ca. 32 kr/kg.',k:'k',s:['raf26_17']}]
+    kval:{t:'Som annen torskefisk: bløgg levende, blø ut i kaldt vann og kjøl ned.',k:'k',s:['nofima']}
   },
   lange:{
     kjenn:[{t:'Lang, nesten ålformet kropp, skjeggtråd og store tenner; den bakre ryggfinnen er svært lang.',k:'e'}],
@@ -1119,8 +1110,7 @@ R.sp = {
     bite:[{t:'Agn på bunnen og sirkelkrok; la fisken ta agnet før du strammer.',k:'e'},
           {t:'Hold riggen i bunnkontakt gjennom hele drifta.',k:'e'}],
     metode:[{t:'Agnrigg eller fireball-rigg med 150–500 g søkke og sterk fortom; makrell, sild eller blekksprut som agn.',k:'e'}],
-    kval:{t:'Bløgg og kjøl som annen torskefisk.',k:'k',s:['nofima']},
-    pris:[]
+    kval:{t:'Bløgg og kjøl som annen torskefisk.',k:'k',s:['nofima']}
   },
   brosme:{
     kjenn:[{t:'Én lang ryggfinne og én lang gattfinne, begge med lys kant; skjeggtråd; gulbrun farge.',k:'e'}],
@@ -1131,8 +1121,7 @@ R.sp = {
     bite:[{t:'Hard bunn og skrenter; kommer ofte som bifangst når du fisker lange.',k:'e'},
           {t:'Fisk fra dypt vann får lett trykkskader og overlever dårlig gjenutsetting.',k:'e'}],
     metode:[{t:'Agnrigg ved bunnen med reke, makrell eller sild.',k:'e'}],
-    kval:{t:'Bløgg og kjøl som annen torskefisk.',k:'k',s:['nofima']},
-    pris:[{t:'Hittil i 2026: brosme 2 kg og større, sløyd uten hode, ca. 19 kr/kg; små brosmer (under 1,4 kg rund) ca. 7–8 kr/kg.',k:'k',s:['raf26_36']}]
+    kval:{t:'Bløgg og kjøl som annen torskefisk.',k:'k',s:['nofima']}
   },
   uer:{
     kjenn:[{t:'Sterkt rød, mørkere på ryggen og lysere på buken, med store skjell.',k:'k',s:['snl_uer']},
@@ -1143,8 +1132,7 @@ R.sp = {
     mat:{t:'Tar krepsdyr og småfisk i vannmassene.',k:'e'},
     bite:[{t:'Står gjerne i stim over bunnen på kanter, 150–400 m.',k:'e'}],
     metode:[{t:'Juksa med flere kroker – målrettet uerfiske er bare lov i juksavinduet nord for 62° N.',k:'r',s:['j78']}],
-    kval:{t:'Sterkt truet (EN) på norsk rødliste; bestanden har gått ned over lang tid.',k:'k',s:['snl_uer']},
-    pris:[]
+    kval:{t:'Sterkt truet (EN) på norsk rødliste; bestanden har gått ned over lang tid.',k:'k',s:['snl_uer']}
   },
   kveite:{
     kjenn:[{t:'Stor flatfisk med øynene på høyre side, mørk overside og hvit underside, stor munn og svakt innbuet halefinne.',k:'e'}],
@@ -1156,8 +1144,7 @@ R.sp = {
           {t:'Store shads eller agn (sei, makrell) sakte langs bunnen.',k:'e'}],
     metode:[{t:'Kraftig stang og snelle, sterk fortom, stor shad eller agnrigg. Ha klart hvordan du slipper fisk under 84 cm og over 2 m.',k:'e'},
             {t:'Fritidsfiske med line etter kveite: høyst 100 kroker (fra 2025).',k:'r',s:['kv25']}],
-    kval:{t:'Livskraftig i Norge, men sterkt truet globalt. HI anbefaler at samlet uttak nord for 62° N ikke overstiger ca. 2 300 tonn i 2026 (inkludert fritids- og turistfiske), og null sør for 62° N.',k:'k',s:['snl_kveite','kv26']},
-    pris:[]
+    kval:{t:'Livskraftig i Norge, men sterkt truet globalt. HI anbefaler at samlet uttak nord for 62° N ikke overstiger ca. 2 300 tonn i 2026 (inkludert fritids- og turistfiske), og null sør for 62° N.',k:'k',s:['snl_kveite','kv26']}
   },
   blakveite:{
     kjenn:[{t:'Mørk på begge sider, derav navnet. Tykkere kropp enn kveita; det ene øyet sitter nesten oppå hodet.',k:'e'}],
@@ -1167,8 +1154,7 @@ R.sp = {
     mat:{t:'Fisk, blekksprut og krepsdyr.',k:'k',s:['snl_blakveite']},
     bite:[{t:'Dypvannsfiske: tunge søkk, agn (makrell eller sild) på flere kroker; elektrisk snelle er vanlig.',k:'e'}],
     metode:[{t:'Kystflåtens direktefiske nord for 62° N har egen åpningsperiode og maksimalkvoter. I 2025 startet det 26. mai og ble stoppet 31. august; for 2026 er maksimalkvoten 9,7 tonn for fartøy under 14 m.',k:'k',s:['raf25_35','rafbk26']}],
-    kval:{t:'Fet fisk som bør kjøles raskt.',k:'e'},
-    pris:[{t:'Hittil i 2026: blåkveite 2,2 kg og større, sløyd med hode, ca. 62 kr/kg; under 1,1 kg ca. 67 kr/kg.',k:'k',s:['raf26_33']}]
+    kval:{t:'Fet fisk som bør kjøles raskt.',k:'e'}
   },
   krabbe:{
     kjenn:[{t:'Stor krabbe med tre par gangbein og to klør. Hunnens hale er bred og skjev, hannens smalere.',k:'e'}],
@@ -1180,8 +1166,7 @@ R.sp = {
     bite:[{t:'Teiner med fet agn (sei, sild, makrell) på bløt bunn; grunnere om våren.',k:'e'}],
     metode:[{t:'Vest for Nordkapp (26° Ø) er fisket fritt for å holde bestanden nede, og utkast er forbudt.',k:'k',s:['snl_krabbe']},
             {t:'Fritidsfiske i kvoteområdet øst for 26° Ø: én teine og høyst 10 krabber i året. All fangst av kongekrabbe skal rapporteres.',k:'r',s:['fritid','kkrapport']}],
-    kval:{t:'Omsettes levende; prisene under gjelder levende krabbe.',k:'k',s:['raf26_25']},
-    pris:[{t:'Hittil i 2026: levende hann 1,6–2,2 kg ca. 394 kr/kg.',k:'k',s:['raf26_25']}]
+    kval:{t:'Omsettes levende.',k:'k',s:['raf26_25']}
   }
 };
 
@@ -1399,8 +1384,7 @@ R.sp.makrell = {
         {t:'Makrellen jager: hold god fart på sluk eller slo.',k:'e'}],
   metode:[{t:'Fritidsfiske: håndsnøre med agn, hekle (makrellslo), dorg med makrellsluk og kastesluk.',k:'k',s:['snl_makrell']},
           {t:'Minstemålet (30 cm) gjelder ikke makrell som ikke skal selges (§ 48).',k:'r',s:['j78']}],
-  kval:{t:'Fet fisk som harskner fort; kjøl den ned raskt.',k:'k',s:['lexmakrel']},
-  pris:[]
+  kval:{t:'Fet fisk som harskner fort; kjøl den ned raskt.',k:'k',s:['lexmakrel']}
 };
 
 /* ---------- Artene: kjernedata (virkelighet) ---------- */
@@ -1478,13 +1462,7 @@ R.hav = [
   ['Bølgehøyde',[
     ['Signifikant bølgehøyde er snittet av den høyeste tredjedelen av bølgene.',['hi_hs']],
     ['Ifølge en bølgeforsker ved MET kan de høyeste enkeltbølgene bli dobbelt så høye som den signifikante bølgehøyden.',['vid_bolger']],
-    ['MET sin API-dokumentasjon sier ikke uttrykkelig om bølgehøyden der er signifikant bølgehøyde. Varselet gjelder et modellpunkt i sjøen nær der du klikket; nær land flyttes punktet til nærmeste sjøpunkt.',['met_ocean']]]],
-  ['Om dataene',[
-    ['Bølger, sjøtemperatur og strøm: MET Oceanforecast 2.0. Vind, temperatur og nedbør: MET Locationforecast 2.0. Farevarsler: MET MetAlerts. Lisens CC BY 4.0.',['met_ocean','met_loc','met_alerts']],
-    ['Tidevann og vannstand: Kartverkets vannstand-API (CC BY 4.0). Tjenesten er gratis, men Kartverket ber om at den ikke belastes unødig.',['kv_tide']],
-    ['Siden henter data rett fra nettleseren din, sjelden, og lar nettleseren bruke svaret til det går ut på tid. MET skriver at nettlesere helst ikke skal kontakte API-et direkte og at IP-adresse og koordinater lagres i loggene deres; små nettsider kan likevel gjøre enkle forespørsler.',['met_tos']],
-    ['Kartet er Kartverkets sjøkart som webkart. «Dybdekart» viser Kartverkets åpne dybdedata (dybdeområder fra zoomnivå 12, dybdekurver fra ca. nivå 14) over et gråtonekart. Når du velger et punkt selv, måler siden avstanden til grunnlinjen med Kartverkets data for Norges maritime grenser, og sier bare fra hvis den endrer minstemålet. Elektroniske sjøkart (ENC) er ikke åpne for fri bruk og kan ikke vises her. Bruk godkjente sjøkart eller kartplotter til navigasjon.',['kv_dybde','kv_nmg','kv_enc']],
-    ['Bølgeperioden kommer fra Open-Meteo (europeiske bølgemodeller med grovere oppløsning enn MET – best på ytterkysten). Oppdrettsanlegg, fiskeplasser og gyteområder hentes fra Fiskeridirektoratet.',['openmeteo','fd_akva','fd_kystnaere']]]]
+    ['MET sin API-dokumentasjon sier ikke uttrykkelig om bølgehøyden der er signifikant bølgehøyde. Varselet gjelder et modellpunkt i sjøen nær der du klikket; nær land flyttes punktet til nærmeste sjøpunkt.',['met_ocean']]]]
 ];
 
 R.fritid.push(['Levende agn','Det er forbudt å bruke levende fisk og andre dyr som agn (unntatt mark og lignende).',['matt_agn']]);
@@ -1635,7 +1613,7 @@ Object.assign(R.sp, {
     bite:[{t:'Grådig jeger om vinteren: fisk drift over kjente plasser og gi deg mens leken er god.',k:'e',s:['fogr_lysing']}],
     metode:[{t:'Lett jigg med shad, eller Fireball-rigg agnet med makrell, ved bunnen.',k:'e',s:['fogr_lysing']},
             {t:'Minstemål 30 cm (§ 47).',k:'r',s:['j78']}],
-    kval:{t:'Bløgg og kjøl som annen torskefisk.',k:'e'}, pris:[]
+    kval:{t:'Bløgg og kjøl som annen torskefisk.',k:'e'}
   },
   hvitting:{
     kjenn:[{t:'Liten torskefisk uten skjeggtråd, med mørk flekk ved roten av brystfinnen og sølvblanke sider.',k:'e'}],
@@ -1646,7 +1624,7 @@ Object.assign(R.sp, {
     mat:{t:'Større hvitting lever av bunndyr og småfisk.',k:'k',s:['snl_hvitting']},
     bite:[{t:'Små kroker og små agnbiter (reke, makrell) tett ved bunnen.',k:'e'}],
     metode:[{t:'Paternoster med 2–3 små kroker og agn, eller lett pilk med opphenger.',k:'e'},{t:'Minstemål 32 cm (§ 47).',k:'r',s:['j78']}],
-    kval:{t:'Hvitt, mildt kjøtt – kjøl ned raskt.',k:'e'}, pris:[]
+    kval:{t:'Hvitt, mildt kjøtt – kjøl ned raskt.',k:'e'}
   },
   steinbit:{
     kjenn:[{t:'Langstrakt kropp, vanligvis gråblå med svarte tverrbånd, og svært kraftige kjever og tenner.',k:'k',s:['snl_grasteinbit']}],
@@ -1657,7 +1635,7 @@ Object.assign(R.sp, {
     bite:[{t:'Driftfiske med naturlig agn ved bunnen.',k:'e',s:['seeberg_steinbit']}],
     metode:[{t:'Agnrigg med attraktorer og naturlig agn tett ved bunnen.',k:'e',s:['seeberg_steinbit']},
             {t:'Ingen minstemål i høstingsforskriften. Alt fiske etter steinbit er forbudt i Saltstraumen marine verneområde fra 26.8.2024.',k:'r',s:['j78','snl_steinbit']}],
-    kval:{t:'Pass fingrene – bittet er kraftig. Bløgg og kjøl ned.',k:'e'}, pris:[]
+    kval:{t:'Pass fingrene – bittet er kraftig. Bløgg og kjøl ned.',k:'e'}
   },
   breiflabb:{
     kjenn:[{t:'Stort, flatt hode med enorm munn. Den fremste finnestrålen i ryggfinnen har en lys hudflik i tuppen som antas å virke som lokkemat.',k:'k',s:['snl_breiflabb']}],
@@ -1667,7 +1645,7 @@ Object.assign(R.sp, {
     mat:{t:'Ligger mest stille eller kraber rundt på bunnen og lokker byttet til seg. Spiser mest fisk, men også krepsdyr og blekksprut.',k:'k',s:['snl_breiflabb']},
     bite:[{t:'Kommer på tungt kystmeite med stort agn.',k:'e',s:['fogr_breiflabb']}],
     metode:[{t:'Minstemål 60 cm gjelder fiske med garn (§ 47). Garnfiske nord for 62° N er forbudt 20. desember–20. mai (§ 39), og breiflabbgarn skal ha minst 360 mm maskevidde (§ 19).',k:'r',s:['j78']}],
-    kval:{t:'Halen er den delen som vanligvis brukes.',k:'e'}, pris:[]
+    kval:{t:'Halen er den delen som vanligvis brukes.',k:'e'}
   },
   piggskate:{
     kjenn:[{t:'Buttsnutet skate med tallrike pigger på kroppsskiven og tre piggrekker på halen. Ikke forveksle med kloskate (Amblyraja radiata), som er en annen art.',k:'k',s:['snl_piggskate','hi_skater']}],
@@ -1678,7 +1656,7 @@ Object.assign(R.sp, {
     mat:{t:'Krepsdyr, småfisk og mark.',k:'e'},
     bite:[{t:'Sirkelkrok og stort agn; gi fisken god tid før du sveiver deg inn på den.',k:'e',s:['fogr_pigg']}],
     metode:[{t:'Ingen minstemål for skater (§ 47). Visit Norway ber deg slippe ut storskate, svartskate og nebbskate.',k:'r',s:['j78','visitno']}],
-    kval:{t:'Vingene er matfisken.',k:'e'}, pris:[]
+    kval:{t:'Vingene er matfisken.',k:'e'}
   },
   taskekrabbe:{
     kjenn:[{t:'Hannen har smal haleklaff og større klør; hunnen har bredere haleklaff og mer buet ryggskjold.',k:'k',s:['snl_taskekrabbe']}],
@@ -1689,7 +1667,7 @@ Object.assign(R.sp, {
     mat:{t:'Både åtseleter og rovdyr: kråkeboller, sjøstjerner, børstemark, snegler, krepsdyr og fisk. Slutter å spise under 5 °C.',k:'k',s:['snl_taskekrabbe']},
     bite:[{t:'Teiner agnet med fisk; mest fangst fra sommer og utover høsten.',k:'k',s:['snl_taskekrabbe']}],
     metode:[{t:'Fritidsfiskere kan bruke inntil 20 teiner. Minstemål 13 cm skjoldbredde (11 cm fra Rogaland til svenskegrensen).',k:'r',s:['snl_taskekrabbe','j78']}],
-    kval:{t:'Best er krabbe med fullt skall, altså fanget rett før skallskiftet.',k:'k',s:['snl_taskekrabbe']}, pris:[]
+    kval:{t:'Best er krabbe med fullt skall, altså fanget rett før skallskiftet.',k:'k',s:['snl_taskekrabbe']}
   },
   hummer:{
     kjenn:[{t:'Levende hummer er grønnsvart med blåaktige knuter og pigger; skallet blir rødt når den kokes. Hunner med utvendig rogn under halen er fredet hele året.',k:'k',s:['snl_hummer']}],
@@ -1702,7 +1680,7 @@ Object.assign(R.sp, {
     metode:[{t:'Sesong fra 1. oktober kl. 08: til og med 30. november fra svenskegrensen til og med Vestland (tidligere Sogn og Fjordane, grensen går ved Stad), og til og med 31. desember fra Møre og Romsdal og nordover.',k:'r',s:['hummersesong','j155']},
             {t:'Påmelding hos Fiskeridirektoratet hvert år, høyst 10 teiner per person og båt (5 i Oslofjorden), og teinene skal røktes minst én gang i uka.',k:'r',s:['hummer','oslo']},
             {t:'Minstemål 25 cm totallengde i hele landet; høyst 32 cm fra svenskegrensen til og med Agder. Rognhummer er fredet hele året.',k:'r',s:['hi_hummer24','snl_hummer']}],
-    kval:{t:'Oppbevar hummeren levende og kjølig til den skal tilberedes.',k:'e'}, pris:[]
+    kval:{t:'Oppbevar hummeren levende og kjølig til den skal tilberedes.',k:'e'}
   }
 });
 R.extra = R.extra.filter(x => ['Hvitting','Lysing','Breiflabb','Taskekrabbe','Hummer'].indexOf(x.navn) < 0);
@@ -2276,6 +2254,39 @@ R.sp.lyr.hvor.push({t:'Vinter (Fiskeskolen): gå til grunntoppene, men fisk ned 
 R.sp.lyr.metode.push({t:'Fiskeskolen om vinteren: jigg litt, fisk litt opp, jigg litt og fisk litt opp igjen – trinnvis oppover langs kanten.', k:'e', s:['yt_s5e1']});
 R.video.lyr = (R.video.lyr || []).concat([['Vinterfiske etter lyr fra båt (YouTube)', SRC.yt_s5e1[1]]]);
 
+/* ===================== Runde 9 (20.11.2026): Fiskeskolen-kart og kveitedyp ===================== */
+/* Fiskeskolens kartskisser brukes fortsatt bare som ekstra referanse – de erstatter ikke tidligere kilder */
+SRC.hi_kveite_rap = ['Havforskningsinstituttet: rapport om kveite – oppvekst grunnere enn 50 m, kveite over 60–70 cm på 0–1000 m', 'https://hi.no/templates/reporteditor/report-pdf?id=97543'];
+SRC.sfm_kveite = ['Sport Fishing Magazine: Wide-Open Light-Tackle Fishing in the North Atlantic (kveite på sandbunn ca. 20–50 m)', 'https://www.sportfishingmag.com/?p=48409'];
+SRC.tsf_kveite = ['Talk Sea Fishing: Norwegian halibut fishing (30–70 m nær land)', 'https://www.talkseafishing.co.uk/norwegian-halibut-fishing/'];
+
+/* kveite: kjernedyp 10–50 → 10–70 m (ytre ramme 5–150 m uendret) */
+Object.assign(R.algo.kveite, {core:[10,70], kilde:R.algo.kveite.kilde.concat(['hi_kveite_rap','sfm_kveite','tsf_kveite']),
+  hvorfor:'grunne topper, bakker og renner mot dypere vann (ca. 10–70 m) vår–høst, og sandsletter med struktur (Fiskeskolen)'});
+R.sp.kveite.hvor.push({t:'Kveite over 60–70 cm finnes i hele dybdeintervallet fra 0 til 1000 m; de minste vokser opp grunnere enn 50 m.', k:'k', s:['hi_kveite_rap']},
+  {t:'Nær land oppgir sportsfiskere ofte ca. 20–70 m, gjerne sandbunn med dypere vann rundt.', k:'e', s:['sfm_kveite','tsf_kveite']});
+
+/* torsk om vinteren: grunntopper og rygger som stiger opp fra dypere vann – toppene og kantene/nebbene ned mot dypet */
+R.algo.torsk.mnd['12-2'] = {core:[5,80], w:{peak:.8, nose:.6, edge:.6, knoll:.3, neardeep:.3, shore:.4},
+  hvorfor:'om vinteren også grunntopper og rygger på ca. 20–90 m som stiger opp fra dypere vann – både toppene og kantene og nebbene ned mot dypet (Fiskeskolen)'};
+R.algo.torsk.kilde = R.algo.torsk.kilde.concat(['seeberg_fs']);
+R.sp.torsk.hvor.push({t:'Vinter (Fiskeskolen): grunntopper og rygger på ca. 20–90 m som stiger opp fra dypere vann – fisk både på toppene og langs kantene og nebbene ned mot dypet.', k:'e', s:['seeberg_fs']});
+
+/* fjordlange: kanter, nebb og små topper langs skråningene på ca. 80–150 m. b = bonus (gir ekstra poeng uten å trekke ned andre bunnformer) */
+Object.assign(R.algo.lange, {core:[80,400], b:{knoll:.25, nose:.15}, kilde:R.algo.lange.kilde.concat(['seeberg_fs']),
+  hvorfor:R.algo.lange.hvorfor + '; i fjordene også kanter, nebb og små topper langs skråningene fra ca. 80 m og nedover (Fiskeskolen)'});
+R.sp.lange.hvor.push({t:'Fjordlange (Fiskeskolen): let langs skråningene i fjorden fra ca. 80 m og nedover – kanter, nebb og små topper eller forhøyninger.', k:'e', s:['seeberg_fs']});
+
+/* piggskate: helt på bunnen fra fjæra ned mot ca. 100 m; slake bakker med fine sedimenter på 20–60 m; liker strøm (sund) */
+Object.assign(R.algo.piggskate, {core:[20,100], range:[0,400], w:{slake:.6, flat:.45, basin:.2}, b:{sund:.3},
+  hvorfor:'bløtbunn på 20–300 m; Fiskeskolen: lever helt på bunnen fra fjæra ned mot ca. 100 m – slake bakker med fine sedimenter på 20–60 m er et godt sted å lete, gjerne der det går strøm'});
+Object.assign(R.algo.piggskate.bunn, {t:'bløtbunn med fine sedimenter'});
+R.sp.piggskate.hvor.push({t:'Fiskeskolen: lever helt på bunnen, fra fjæra ned til rundt 100 m. Slake bakker med fine sedimenter på 20–60 m er et godt sted å lete. Den liker strøm og steder med mye krepsdyr og skjell å spise.', k:'e', s:['seeberg_s3e7']});
+
+/* sild (andre arter): Fiskeskolens kart over typiske sildeplasser */
+R.extraInfo['Sild'].hvor += ' Fiskeskolens kart over typiske sildeplasser viser grunne viker og sund nær land, ca. 10–35 m.';
+R.extraInfo['Sild'].hs = R.extraInfo['Sild'].hs.concat(['seeberg_fs']);
+
 </script>
 <script>
 (function(){
@@ -2427,9 +2438,11 @@ const MINTAB = {
 };
 
 /* ---------- kilder og merker ---------- */
-const SHORTSRC = {matt_fritid:'Mattilsynet', akva18:'§ Akvakulturdriftsforskr.', sjomat_akva:'Sjømat Norge', klikk_bitt:'klikk.no', bk_salt:'Bergen kommune', ut_hellesoy:'UT.no', uscg_fv:'USCG', uscg_boats:'USCG', openmeteo:'Open-Meteo', j155:'Fiskeridir.', j78:'§ Høstingsforskr.', hf24:'§ Høstingsforskr.', lovdata:'Lovdata', kv26:'Regjeringen', kv25:'Regjeringen', fritid:'Regjeringen', ktsor:'Regjeringen', oslo:'Regjeringen', tollkvote:'Tolletaten', tollsalg:'Tolletaten', sfagder:'Statsforvalteren', sfagderlaks:'Statsforvalteren', sfvest:'Statsforvalteren', hummer:'Fiskeridir.', kkrapport:'Fiskeridir.', leppe:'Fiskeridir.', ukestat:'Fiskeridir.', hummersesong:'HI', hikveite:'HI', hilyr:'HI', hi_hs:'HI', uerlarver:'Toktrapport', visitno:'Visit Norway', visiten:'Visit Norway', fhf:'FHF/Nofima', faois:'FAO', faoslurry:'FAO', fiskerfradrag:'Stortinget', bergen:'Bergen kommune', lexmakrel:'lex.dk', matt_agn:'Mattilsynet', ngu_beaufort:'NGU', wmo_sea:'WMO', vid_bolger:'Videnskab.dk', reg_terr:'Regjeringen', uit_kveite:'UiT', uit_skate:'UiT', hi_kveite24:'HI', hi_skater:'HI', hake_spawn:'Forskning', raf25_43:'Råfisklaget', fiskogrask:'Fisk og rask', aof_kveite:'Alt om Fiske', aof_hav:'Alt om Fiske', bsf_boom:'British Sea Fishing', hooked_sei:'Hooked', ath_hvitting:'Atlanterhavsparken', fiskeridir_redskap:'Fiskeridir.'};
+const SHORTSRC = {matt_fritid:'Mattilsynet', akva18:'§ Akvakulturdriftsforskr.', sjomat_akva:'Sjømat Norge', klikk_bitt:'klikk.no', bk_salt:'Bergen kommune', ut_hellesoy:'UT.no', uscg_fv:'USCG', uscg_boats:'USCG', openmeteo:'Open-Meteo', j155:'Fiskeridir.', j78:'§ Høstingsforskr.', hf24:'§ Høstingsforskr.', lovdata:'Lovdata', kv26:'Regjeringen', kv25:'Regjeringen', fritid:'Regjeringen', ktsor:'Regjeringen', oslo:'Regjeringen', tollkvote:'Tolletaten', tollsalg:'Tolletaten', sfagder:'Statsforvalteren', sfagderlaks:'Statsforvalteren', sfvest:'Statsforvalteren', hummer:'Fiskeridir.', kkrapport:'Fiskeridir.', leppe:'Fiskeridir.', ukestat:'Fiskeridir.', hummersesong:'HI', hikveite:'HI', hilyr:'HI', hi_hs:'HI', uerlarver:'Toktrapport', visitno:'Visit Norway', visiten:'Visit Norway', fhf:'FHF/Nofima', faois:'FAO', faoslurry:'FAO', fiskerfradrag:'Stortinget', bergen:'Bergen kommune', lexmakrel:'lex.dk', matt_agn:'Mattilsynet', ngu_beaufort:'NGU', wmo_sea:'WMO', vid_bolger:'Videnskab.dk', reg_terr:'Regjeringen', uit_kveite:'UiT', uit_skate:'UiT', hi_kveite24:'HI', hi_skater:'HI', hake_spawn:'Forskning', raf25_43:'Råfisklaget', fiskogrask:'Fisk og rask', aof_kveite:'Alt om Fiske', aof_hav:'Alt om Fiske', bsf_boom:'British Sea Fishing', hooked_sei:'Hooked', ath_hvitting:'Atlanterhavsparken', fiskeridir_redskap:'Fiskeridir.', sfm_kveite:'Sport Fishing', tsf_kveite:'Talk Sea Fishing'};
 const short = id => id.indexOf('fogr_') === 0 ? 'Fisk og rask' : id.indexOf('seeberg_') === 0 ? 'Seeberg' : id.indexOf('snl_') === 0 ? 'SNL' : id.indexOf('raf') === 0 ? 'Råfisklaget' : id.indexOf('nofima') === 0 ? 'Nofima' : id.indexOf('met_') === 0 ? 'MET' : id.indexOf('kv_') === 0 ? 'Kartverket' : id.indexOf('njff_') === 0 ? 'NJFF' : id.indexOf('hk_') === 0 ? 'Hooked' : id.indexOf('hi_') === 0 ? 'HI' : id.indexOf('aof_') === 0 ? 'Alt om Fiske' : id.indexOf('fd_') === 0 ? 'Fiskeridir.' : id.indexOf('ngu_') === 0 ? 'NGU' : id.indexOf('sdir_') === 0 ? 'Sjøfartsdir.' : id.indexOf('garmin_') === 0 ? 'Garmin' : id.indexOf('ray_') === 0 ? 'Raymarine' : id.indexOf('bsf_') === 0 ? 'British Sea Fishing' : id.indexOf('daiwa_') === 0 ? 'Daiwa' : id.indexOf('klikk_') === 0 ? 'klikk.no' : id.indexOf('mustad_') === 0 ? 'Mustad' : id.indexOf('wiki_') === 0 ? 'Wikipedia' : id.indexOf('yt_') === 0 ? 'YouTube' : id.indexOf('hooked_') === 0 ? 'Hooked' : id.indexOf('jf_') === 0 ? 'Jakt & Fiske' : id.indexOf('blueye_') === 0 ? 'Blueye' : id.indexOf('naturalis_') === 0 ? 'Naturalis' : id.indexOf('ak_') === 0 ? 'Animated Knots' : id.indexOf('nk_') === 0 ? 'NetKnots' : id.indexOf('fs_') === 0 ? 'Field & Stream' : id.indexOf('ol_') === 0 ? 'Outdoor Life' : id.indexOf('bt101_') === 0 ? 'Boat Tests 101' : id.indexOf('bsm_') === 0 ? 'BOATsmart!' : id.indexOf('cf_') === 0 ? 'Campfire Collective' : id.indexOf('nsw_') === 0 ? 'NSW' : id.indexOf('boated_') === 0 ? 'Boat-Ed' : id.indexOf('boot_') === 0 ? 'boot Düsseldorf' : id.indexOf('bayliner_') === 0 ? 'Bayliner' : id.indexOf('gop_') === 0 ? 'Great Outdoor Provision' : id.indexOf('ev_') === 0 ? 'Everand' : (SHORTSRC[id] || 'Kilde');
 const src = ids => (ids || []).filter(i => SRC[i]).map(i => '<a class="tag k" href="' + esc(SRC[i][1]) + '" target="_blank" rel="noopener" title="' + esc(SRC[i][0]) + '">' + esc(short(i)) + '</a>').join('');
+/* kilder uten like merkelapper etter hverandre (f.eks. to MET-tjenester blir ett «MET»-merke) */
+const srcU = ids => src((ids || []).filter((i, k, a) => a.findIndex(j => short(j) === short(i)) === k));
 const TAG = {
   e: '<span class="tag e" title="Fiskererfaring eller allmenn kunnskap – ikke kildesjekket her">Erfaring</span>',
   r: '<span class="tag r" title="Lov eller regel">Regel</span>', k: ''
@@ -2502,8 +2515,7 @@ function monthGroups(m, reg){
 function summaryCard(m, reg, title){
   const g = monthGroups(m, reg);
   const line = (lbl, arr, cls) => '<div class="kv" style="display:block"><span style="display:block;margin-bottom:4px">' + lbl + '</span>' + (arr.length ? '<span class="chips l">' + arr.map(x => '<em class="chip ' + cls + '" style="cursor:pointer" data-go="art-' + x[0] + '" title="' + esc(x[2]) + '">' + esc(x[1]) + '</em>').join('') + '</span>' : '<span style="color:var(--dim);font-weight:500">Ingen</span>') + '</div>';
-  return '<div class="card"><h3>' + esc(title) + '</h3>' + line('Sesong eller åpent vindu', g.open, 'g') + line('Gyter eller parrer seg nå', g.spawn, 'p') + line('Fredet eller forbudt', g.closed, 'x') + line('Begrenset', g.lim, 'w') +
-    '<p class="note">Fargene bygger på dokumenterte perioder og regler – ikke på fangstprognoser. Arter uten markering kan fiskes etter vanlige regler.</p></div>';
+  return '<div class="card"><h3>' + esc(title) + '</h3>' + line('Sesong eller åpent vindu', g.open, 'g') + line('Gyter eller parrer seg nå', g.spawn, 'p') + line('Fredet eller forbudt', g.closed, 'x') + line('Begrenset', g.lim, 'w') + '</div>';
 }
 function renderMonth(){
   const m = month(), reg = REG();
@@ -2552,7 +2564,6 @@ function renderSpeciesList(){
   h += '<div class="card" style="margin-top:14px"><h3>Arter du må slippe ut</h3><div class="pill-list">' + R.slipp.map(x => '<span>' + esc(x) + '</span>').join('') + '</div><p class="note">Liste fra Visit Norway' + src(['visitno']) + '. Kontroller gjeldende regler på fiskeridir.no.</p></div>';
   return h;
 }
-function priceList(r){ return r.pris && r.pris.length ? '<ul class="f">' + li(r.pris) + '</ul><p class="note">Førstehåndspriser til fisker fra Råfisklaget – ikke butikkpris.</p>' : '<p class="note" style="margin-top:0">Ingen førstehåndspris hentet for denne arten.</p>'; }
 function renderSpecies(sp){
   const a = ART[sp]; if (!a) return renderSpeciesList();
   const r = R.sp[sp], m = month(), reg = REG(), mh = minHere(sp, reg), pl = perHere(sp, reg);
@@ -2577,7 +2588,7 @@ function renderSpecies(sp){
     '<div class="tbl" style="margin-top:10px"><table><thead><tr><th>Nord 62°, innenfor 4 nm</th><th>Nord 62°, utenfor 4 nm</th><th>Sør for 62° N</th></tr></thead><tbody><tr>' + MINTAB[sp].map(v => '<td>' + esc(v) + '</td>').join('') + '</tr></tbody></table></div>' +
     lawRows.map(l => '<h4>' + esc(l[0]) + src([l[2]]) + '</h4>' + l[1].map(t => '<div class="law">' + esc(t) + '</div>').join('')).join('') +
     '<p class="note"><a href="#regler" data-go="regler">Alle regler ›</a></p></div>';
-  h += '<div class="card"><h3>Pris, kvalitet og status</h3>' + priceList(r) + '<h4>Kvalitet og status</h4><ul class="f"><li>' + item(r.kval) + '</li><li><a href="#handbok" data-go="handbok">Slik bløgger og iser du riktig ›</a></li></ul></div>';
+  h += '<div class="card"><h3>Kvalitet og status</h3><ul class="f"><li>' + item(r.kval) + '</li><li><a href="#handbok" data-go="handbok">Slik bløgger og iser du riktig ›</a></li></ul></div>';
   return h + '</div>';
 }
 
@@ -2657,7 +2668,7 @@ function renderGloss(){
   return '<h2 class="sec-title">Ordliste</h2><div class="card"><div class="grid2">' + R.gloss.map(g => '<div class="kv" style="display:block" id="o-' + slug(g[0]) + '"><b>' + esc(g[0]) + '</b><div style="color:var(--muted)">' + esc(g[1]) + '</div></div>').join('') + '</div></div>';
 }
 function renderSources(){
-  return '<div class="card spar' + (S.spar ? ' on' : '') + '" id="spar"><h3>Strømsparing ' + (S.spar ? 'er på' : 'er av') + '</h3><p style="margin:0">Slår av kartene og automatisk henting av vær og tidevann (hent med «Oppdater»), og bruker GPS sjeldnere i tur-modus uten å holde skjermen på. Nyttig når mobilbatteriet må vare hele turen.</p><p style="margin:10px 0 0"><button class="btn pri" data-act="spar">' + (S.spar ? 'Slå av strømsparing' : 'Slå på strømsparing') + '</button></p></div>' +
+  return '<div class="card spar' + (S.spar ? ' on' : '') + '" id="spar"><h3>Strømsparing ' + (S.spar ? 'er på' : 'er av') + '</h3><p style="margin:0">Slår av kartene og automatisk henting av vær og tidevann (hent dem med «Hent live-data» under «Kart og vær»), og bruker GPS sjeldnere i tur-modus uten å holde skjermen på. Nyttig når mobilbatteriet må vare hele turen.</p><p style="margin:10px 0 0"><button class="btn pri" data-act="spar">' + (S.spar ? 'Slå av strømsparing' : 'Slå på strømsparing') + '</button></p></div>' +
   '<h2 class="sec-title">Kilder</h2><p class="lead">Fakta og regler er lest i november 2026. Lovteksten er hentet fra Fiskeridirektoratets J-melding med hele forskriften (J-78-2026) og en Lovdata-utgave fra 2024. Live-data hentes direkte fra MET Norway og Kartverket når du åpner «Kart og vær».</p>' + legendTags() +
     '<div class="card"><ul class="f">' + Object.entries(SRC).map(([k, v]) => '<li><a href="' + esc(v[1]) + '" target="_blank" rel="noopener">' + esc(v[0]) + '</a> <span class="tag k">' + esc(short(k)) + '</span></li>').join('') + '</ul></div>';
 }
@@ -2830,7 +2841,36 @@ function profCtl(Lf, key, boxId){
 }
 function pfState(key, boxId){ const m = PFMAP[key](); if (!m) return null; if (!m._pf) m._pf = {key, box: boxId, on: false, a: null, b: null, layer: null, html: '', run: 0}; return m._pf; }
 function pfBtn(key, on){ const m = PFMAP[key](); if (!m) return; const b = m.getContainer().querySelector('.profbtn'); if (b) b.classList.toggle('on', !!on); m.getContainer().style.cursor = on ? 'crosshair' : ''; }
-function profPaint(key){ const m = PFMAP[key](); if (!m || !m._pf) return; const pf = m._pf, el = document.getElementById(pf.box); if (!el) return; el.hidden = !pf.html; el.innerHTML = pf.html; }
+function profPaint(key){ const m = PFMAP[key](); if (!m || !m._pf) return; const pf = m._pf, el = document.getElementById(pf.box); if (!el) return;
+  if (pf.data && !pf.on) pf.html = profHtml(pf);
+  el.hidden = !pf.html; el.innerHTML = pf.html; }
+/* posisjonen din på profilen: GPS i tur-modus, ellers siste «Min posisjon» (inntil 30 min gammel) */
+const GEO = {p: null, t: 0, acc: null};
+function myPos(){
+  if (TUR.on && TUR.last) return {p: TUR.last, acc: TUR.acc || 0, t: Date.now(), live: true};
+  if (GEO.p && Date.now() - GEO.t < 30 * 60e3) return {p: GEO.p, acc: GEO.acc || 0, t: GEO.t, live: false};
+  return null;
+}
+/* hvor langt langs streken du er (d, m fra A) og hvor langt fra streken (off, m) – bare når du er på streken */
+function profPos(pf){
+  const me = myPos(); if (!me || !pf || !pf.a || !pf.b || !pf.L) return null;
+  const [ax, ay] = merc(pf.a.lat, pf.a.lng), [bx, by] = merc(pf.b.lat, pf.b.lng), [px, py] = merc(me.p[0], me.p[1]);
+  const vx = bx - ax, vy = by - ay, L2 = vx * vx + vy * vy; if (!L2) return null;
+  const Lp = Math.sqrt(L2), k = pf.L / Lp, along = ((px - ax) * vx + (py - ay) * vy) / L2 * pf.L, off = Math.abs((px - ax) * vy - (py - ay) * vx) / Lp * k;
+  const tol = Math.min(200, Math.max(60, 2 * me.acc, pf.L * .1));
+  if (off > tol || along < -30 || along > pf.L + 30) return null;
+  return {d: Math.min(pf.L, Math.max(0, along)), off, age: me.live ? 0 : Date.now() - me.t};
+}
+const profSig = pos => pos ? Math.round(pos.d / 3) + '|' + Math.round(pos.off / 10) + '|' + Math.round(pos.age / 60e3) : '-';
+function profHtml(pf){ const pos = profPos(pf); pf.sig = profSig(pos); return '<div class="card prof">' + pf.head + '<div class="pbody">' + profChart(pf.data, pf.L, pos) + '</div></div>'; }
+/* når posisjonen endrer seg: tegn bare grafen på nytt (knappene i hodet blir stående) */
+function profLive(){
+  Object.keys(PFMAP).forEach(key => { const m = PFMAP[key](); if (!m || !m._pf) return; const pf = m._pf; if (!pf.data || pf.on) return;
+    const pos = profPos(pf), sig = profSig(pos); if (sig === pf.sig) return;
+    pf.sig = sig; pf.html = '<div class="card prof">' + pf.head + '<div class="pbody">' + profChart(pf.data, pf.L, pos) + '</div></div>';
+    const el = document.getElementById(pf.box), body = el && el.querySelector('.pbody');
+    if (body) body.innerHTML = profChart(pf.data, pf.L, pos); else profPaint(key); });
+}
 function profStart(key, boxId){
   const pf = pfState(key, boxId); if (!pf) return; const m = PFMAP[key]();
   profClear(key, true); pf.on = true; pf.a = pf.b = null; pfBtn(key, true);
@@ -2841,18 +2881,18 @@ function profStart(key, boxId){
     m.on('click', pf.onClick); }
 }
 function profCancel(key){ const m = PFMAP[key](); if (!m || !m._pf) return; m._pf.on = false; pfBtn(key, false); if (!m._pf.b) profClear(key); }
-function profClear(key, keepState){ const m = PFMAP[key](); if (!m || !m._pf) return; const pf = m._pf; if (pf.layer){ m.removeLayer(pf.layer); pf.layer = null; } pf.run++;
+function profClear(key, keepState){ const m = PFMAP[key](); if (!m || !m._pf) return; const pf = m._pf; if (pf.layer){ m.removeLayer(pf.layer); pf.layer = null; } pf.run++; pf.data = null;
   if (!keepState){ pf.on = false; pf.a = pf.b = null; pf.html = ''; pfBtn(key, false); } profPaint(key); }
 function profDraw(key){
   const m = PFMAP[key](), pf = m._pf, Lf = window.L; if (pf.layer) m.removeLayer(pf.layer); pf.layer = Lf.layerGroup().addTo(m);
   const pts = () => [pf.a, pf.b || pf.a], casing = Lf.polyline(pts(), {color: '#ffffff', weight: 6, opacity: .9, interactive: false}).addTo(pf.layer), line = Lf.polyline(pts(), {color: '#1d3557', weight: 3, interactive: false}).addTo(pf.layer);
   [['a', 'A'], ['b', 'B']].forEach(([k, t]) => { if (!pf[k]) return;
     Lf.marker(pf[k], {draggable: true, autoPan: true, title: t + ' – dra for å flytte', icon: Lf.divIcon({className: 'pfpt', html: '<span>' + t + '</span>', iconSize: [22, 22], iconAnchor: [11, 11]})}).addTo(pf.layer)
-      .on('drag', e => { pf[k] = e.target.getLatLng(); casing.setLatLngs(pts()); line.setLatLngs(pts()); })
+      .on('drag', e => { pf[k] = e.target.getLatLng(); pf.data = null; casing.setLatLngs(pts()); line.setLatLngs(pts()); })
       .on('dragend', () => { if (pf.a && pf.b) profCalc(key); }); });
 }
 async function profCalc(key){
-  const m = PFMAP[key](), pf = m._pf, run = ++pf.run, a = [pf.a.lat, pf.a.lng], b = [pf.b.lat, pf.b.lng];
+  const m = PFMAP[key](), pf = m._pf, run = ++pf.run, a = [pf.a.lat, pf.a.lng], b = [pf.b.lat, pf.b.lng]; pf.data = null;
   const Lkm = km(a, b), brg = bearing(a, b);
   const head = '<div class="profhead"><b>Dybdeprofil</b><span class="pmut">A → B · ' + (Lkm < 1 ? fmt(Lkm * 1000, 0) + ' m' : fmt(Lkm, 2) + ' km') + ' · ' + fmt(brg, 0) + '° ' + compass(brg) + '</span><span class="psp"></span>' +
     (key === 'kart' && S.driftOn && DR.res ? '<button class="btn sm" data-act="profdrift">Langs driften</button>' : '') + '<button class="btn sm" data-act="profnew" data-k="' + key + '">Ny strek</button><button class="btn sm" data-act="profclr" data-k="' + key + '">Fjern</button></div>';
@@ -2867,9 +2907,9 @@ async function profCalc(key){
   const n = Math.min(500, Math.max(60, Math.round(Lkm * 1000 / 5))), S2 = [];
   for (let i = 0; i <= n; i++){ const t = i / n, x = ax + (bx2 - ax) * t, y = ay + (by2 - ay) * t, px = Math.min(W - 1, Math.floor((x - x0) / (x1 - x0) * W)), py = Math.min(H - 1, Math.floor((y1 - y) / (y1 - y0) * H)), k = (py * W + px) * 4;
     const iv = dd[k + 3] > 200 ? depthOf(dd[k]) : null; S2.push({d: t * Lkm * 1000, a: iv ? iv[0] : null, b: iv ? iv[1] : null, nod: dd[k + 3] <= 200}); }
-  pf.html = '<div class="card prof">' + head + profChart(S2, Lkm * 1000) + '</div>'; pf.data = S2; profPaint(key);
+  pf.head = head; pf.L = Lkm * 1000; pf.data = S2; profPaint(key);
 }
-function profChart(S2, L){
+function profChart(S2, L, pos){
   const ok = S2.filter(s => s.b != null); if (!ok.length) return '<p class="note">Ingen dybdedata langs streken (land eller ikke sjømålt).</p>';
   const maxB = Math.max.apply(null, ok.map(s => s.b)), dStep = niceStep(Math.max(1, maxB), 4), maxD = Math.ceil(maxB / dStep) * dStep;
   const Wd = 640, Hd = 200, l = 44, r = 10, t = 14, bt = 24, pw = Wd - l - r, ph = Hd - t - bt, X = d => l + d / L * pw, Y = v => t + v / maxD * ph;
@@ -2889,11 +2929,16 @@ function profChart(S2, L){
   let st = null; const step = L / (S2.length - 1), k = Math.max(1, Math.round(100 / step));
   for (let i = 0; i + k < S2.length; i++){ const p = S2[i], q = S2[i + k]; if (p.b == null || q.b == null) continue; const dv = Math.abs((q.a + q.b) / 2 - (p.a + p.b) / 2); if (!st || dv > st.dv) st = {dv, at: (p.d + q.d) / 2, from: p, to: q}; }
   const iv = s => fmt(s.a, 0) + '–' + fmt(s.b, 0) + ' m';
+  let me = '', meTxt = '';
+  if (pos){ const i = Math.max(0, Math.min(S2.length - 1, Math.round(pos.d / L * (S2.length - 1)))), s = S2[i], x = X(pos.d), xs = x.toFixed(1), yd = s.b != null ? Y((s.a + s.b) / 2) : t + ph, right = x < Wd - r - 110, ly = x < l + 24 || x > Wd - r - 24 ? t + 27 : t + 12;
+    me = '<g class="ppos"><line x1="' + xs + '" x2="' + xs + '" y1="' + t + '" y2="' + yd.toFixed(1) + '"/>' + (s.b != null ? '<circle cx="' + xs + '" cy="' + yd.toFixed(1) + '" r="4.5"/>' : '') +
+      '<path d="M' + xs + ',' + (t + 1) + 'l-6,-10h12z"/><text x="' + (right ? x + 9 : x - 9).toFixed(1) + '" y="' + ly + '"' + (right ? '' : ' text-anchor="end"') + '>Du' + (s.b != null ? ' · ' + fmt(s.a, 0) + '–' + fmt(s.b, 0) + ' m' : '') + '</text></g>';
+    meTxt = '<span class="pme">Du er her: <b>' + (s.b != null ? fmt(s.a, 0) + '–' + fmt(s.b, 0) + ' m' : (s.nod ? 'land' : 'ingen dybdedata')) + '</b> (' + fmtD(pos.d) + ' fra A' + (pos.off > 25 ? ', ' + fmt(Math.round(pos.off / 5) * 5, 0) + ' m fra streken' : '') + (pos.age > 2 * 60e3 ? ', posisjon fra ' + Math.round(pos.age / 60e3) + ' min siden' : '') + ')</span>'; }
   return '<svg class="pchart" viewBox="0 0 ' + Wd + ' ' + Hd + '" role="img" aria-label="Dybdeprofil fra A til B">' + g + gaps + band + mid +
-    '<text x="' + (l + 4) + '" y="' + (t + 11) + '" class="pab">A</text><text x="' + (Wd - r - 4) + '" y="' + (t + 11) + '" class="pab" text-anchor="end">B</text></svg>' +
-    '<div class="pstat"><span>Grunnest <b>' + iv(shal) + '</b> (' + fmtD(shal.d) + ' fra A)</span><span>Dypest <b>' + iv(deep) + '</b> (' + fmtD(deep.d) + ' fra A)</span>' +
+    '<text x="' + (l + 4) + '" y="' + (t + 11) + '" class="pab">A</text><text x="' + (Wd - r - 4) + '" y="' + (t + 11) + '" class="pab" text-anchor="end">B</text>' + me + '</svg>' +
+    '<div class="pstat">' + meTxt + '<span>Grunnest <b>' + iv(shal) + '</b> (' + fmtD(shal.d) + ' fra A)</span><span>Dypest <b>' + iv(deep) + '</b> (' + fmtD(deep.d) + ' fra A)</span>' +
     (st && st.dv >= 10 ? '<span>Brattest: fra ' + iv(st.from) + ' til ' + iv(st.to) + ' på ca. 100 m, ' + fmtD(st.at) + ' fra A</span>' : '<span>Ingen bratte kanter langs streken</span>') + '</div>' +
-    '<p class="note">Båndet viser Kartverkets dybdeintervall langs streken (f.eks. 20–30 m), linjen midten av intervallet – ikke målte enkeltdybder. Brunt = land, grått = ikke sjømålt. Ikke for navigasjon.</p>';
+    '<p class="note">Kilde: ' + src(['kv_dybde']) + '</p>';
 }
 const fmtD = d => d >= 1000 ? fmt(d / 1000, 2) + ' km' : fmt(d, 0) + ' m';
 document.addEventListener('click', e => { const a = e.target.closest('[data-act="profclr"],[data-act="profnew"],[data-act="profdrift"]'); if (!a) return; e.preventDefault();
@@ -2925,16 +2970,12 @@ function bunnLegend(id, on){
   return '<div class="blegend" id="' + id + '"' + (on ? '' : ' hidden') + '><b>Bunntype</b>' + R.bunn.map(x => '<span><i style="background:rgb(' + x.c.join(',') + ')"></i>' + esc(x.n) + '</span>').join('') +
     '<span class="bhint"></span>' + src(['ngu_sed']) + '</div>';
 }
-/* sjekk om NGU har bunntype i kartutsnittet (lite bilde, telle fargede punkter) */
-async function bunnCheck(m, id){
+/* bunntype: bare et hint når kartet er zoomet for langt ut */
+function bunnCheck(m, id){
   const el = document.querySelector('#' + id + ' .bhint'); if (!el || !m || !window.L) return;
   const Lf = window.L, b = m.getBounds(), crs = Lf.CRS.EPSG3857, p0 = crs.project(b.getSouthWest()), p1 = crs.project(b.getNorthEast()), sz = m.getSize();
-  const W = Math.max(60, Math.round(sz.x / 2)), H = Math.max(40, Math.round(sz.y / 2)), mpx = (p1.x - p0.x) / W;
-  if (mpx / 0.00028 > 2.4e6){ el.textContent = 'Zoom inn for å se bunntypen.'; return; }
-  try { const d = await wmsImg(NGU + '?service=WMS&version=1.1.1&request=GetMap&styles=&srs=EPSG:3857&format=image/png&transparent=true&width=' + W + '&height=' + H + '&layers=NiN_DK_Det&bbox=' + [p0.x, p0.y, p1.x, p1.y].map(v => v.toFixed(1)).join(','), W, H);
-    let n = 0; for (let i = 3; i < d.length; i += 4) if (d[i] > 200) n++;
-    el.textContent = n ? '' : 'NGU har ikke kartlagt bunntypen i dette utsnittet – bare deler av kysten er kartlagt (bl.a. rundt Florø og Ålesund).';
-  } catch(e){ el.textContent = 'Fikk ikke kontakt med NGU.'; }
+  const mpx = (p1.x - p0.x) / Math.max(60, Math.round(sz.x / 2));
+  el.textContent = mpx / 0.00028 > 2.4e6 ? 'Zoom inn for å se bunntypen.' : '';
 }
 function setBunn(){ if (!map || !bunnLay) return; if (S.bunn) bunnLay.addTo(map); else map.removeLayer(bunnLay); const lg = document.getElementById('bunnLeg'); if (lg) lg.hidden = !S.bunn; if (S.bunn) bunnCheck(map, 'bunnLeg'); }
 function mountMap(){
@@ -2974,7 +3015,8 @@ function mapExtras(){
   mk.setLatLng([S.pos.lat, S.pos.lon]); if (ring) ring.setLatLng([S.pos.lat, S.pos.lon]); if (AQ.ring) AQ.ring.setLatLng([S.pos.lat, S.pos.lon]); if (S.akva && AQ.feats.length){ nearAqua(); paintAqua(); }
   if (mkModel){ map.removeLayer(mkModel); mkModel = null; } if (mkLine){ map.removeLayer(mkLine); mkLine = null; }
   if (LV.ocean && LV.ocean.geometry){ const g = LV.ocean.geometry.coordinates, p = [g[1], g[0]];
-    if (km(p, [S.pos.lat, S.pos.lon]) > 0.05){ mkModel = Lf.circleMarker(p, {radius: 6, color: '#61cfd8', weight: 2, fillOpacity: 0, dashArray: '3 3'}).addTo(map).bindTooltip('MET-modellpunkt for bølger og sjø'); mkLine = Lf.polyline([p, [S.pos.lat, S.pos.lon]], {color: '#61cfd8', weight: 1.5, dashArray: '4 4'}).addTo(map); } }
+    const dk = km(p, [S.pos.lat, S.pos.lon]);
+    if (dk > 2){ mkModel = Lf.circleMarker(p, {radius: 6, color: '#61cfd8', weight: 2, fillOpacity: 0, dashArray: '3 3'}).addTo(map).bindTooltip('Bølger og sjø er hentet fra MET-modellpunktet her, ca. ' + fmt(dk, dk < 10 ? 1 : 0) + ' km fra valgt punkt'); mkLine = Lf.polyline([p, [S.pos.lat, S.pos.lon]], {color: '#61cfd8', weight: 1.5, dashArray: '4 4'}).addTo(map); } }
 }
 function dypHint(){ const el = document.getElementById('dypHint'); if (el) el.textContent = map && S.base === 'dyp' && map.getZoom() < 12 ? 'Zoom inn (nivå 12+) for å se dybdedataene' : ''; }
 function setBase(k){ if (!map || !layers[k]) return; Object.values(layers).forEach(l => map.removeLayer(l)); layers[k].addTo(map); S.base = k; save(); document.querySelectorAll('[data-base]').forEach(b => b.classList.toggle('on', b.dataset.base === k)); dypHint(); }
@@ -3042,11 +3084,11 @@ function paintOverview(){
   let h = '<h3>Vestlandet nå</h3><p class="note" style="margin-top:0">Vind, bølger, temperatur og neste flo/fjære for ' + list.length + ' punkter i Rogaland og Vestland. ' + (OV.busy ? 'Henter …' : OV.at ? 'Hentet kl. ' + tm(OV.at) + '.' : '') + '</p>';
   if (!any) h += '<button class="btn pri" data-act="ovw">Hent forholdene for alle punktene</button><p class="note">Henter ett punkt om gangen fra MET og Kartverket (ca. 50 forespørsler).</p>';
   else {
-    h += '<div class="tbl"><table><thead><tr><th>Sted</th><th class="n">Vind (kast)</th><th class="n">Kast maks 24 t</th><th class="n">Bølger nå</th><th class="n">Maks 24 t</th><th class="n">Periode</th><th class="n">Sjø</th><th class="n">Luft</th><th>Neste flo/fjære</th><th></th></tr></thead><tbody>' +
+    h += '<div class="tbl"><table><thead><tr><th>Sted</th><th class="n">Vind m/s (kast)</th><th class="n">Kast maks 24 t</th><th class="n">Bølger nå</th><th class="n">Maks 24 t</th><th class="n">Periode</th><th class="n">Sjø</th><th class="n">Luft</th><th>Neste flo/fjære (cm)</th><th></th></tr></thead><tbody>' +
       ovwGroups().map(g => '<tr class="grp"><td colspan="10">' + esc(g[0]) + '</td></tr>' + g[1].map(([n]) => { const r = OV.rows[n]; if (!r) return '<tr><td><b>' + esc(n) + '</b></td><td colspan="9" style="color:var(--dim)">' + (OV.busy ? 'venter …' : '–') + '</td></tr>';
         const ev = (r.ev || []).map(x => (x.f === 'high' ? 'Flo ' : 'Fjære ') + tm(x.t) + ' (' + fmt(x.v, 0) + ')').join(' · ');
         return '<tr' + (S.pos && S.pos.name === n ? ' class="cur"' : '') + '><td><b>' + esc(n) + '</b></td><td class="n">' + (r.lerr ? '–' : fmt(r.ws, 0) + ' (' + fmt(r.wg, 0) + ') ' + compass(r.wd)) + '</td><td class="n">' + (r.gMax != null ? fmt(r.gMax, 0) + ' m/s' : '–') + '</td><td class="n">' + (r.oerr ? '–' : fmt(r.hs, 1) + ' m') + '</td><td class="n">' + (r.hsMax != null ? fmt(r.hsMax, 1) + ' m' : '–') + '</td><td class="n">' + (r.tp != null ? fmt(r.tp, 0) + ' s' : '–') + '</td><td class="n">' + (r.oerr ? '–' : fmt(r.sst, 1) + '°') + '</td><td class="n">' + (r.lerr ? '–' : fmt(r.at, 0) + '°') + '</td><td>' + (r.terr ? '<span style="color:var(--dim)">' + esc(String(r.terr).slice(0, 60)) + '</span>' : esc(ev || '–')) + '</td><td><button class="btn" data-act="ovpick" data-p="' + esc(n) + '">Vis</button></td></tr>'; }).join('')).join('') +
-      '</tbody></table></div><p class="note">Vind i m/s og retning den kommer fra. Bølgehøyde fra MET-modellpunktet. Flo/fjære i cm over sjøkartnull (Kartverket). ' + (OV.busy ? '' : '<a href="#" data-act="ovw">Oppdater</a>') + '</p>';
+      '</tbody></table></div><p class="note">Kilde: ' + srcU(['met_loc', 'met_ocean', 'openmeteo', 'kv_tide']) + (OV.busy ? '' : ' · <a href="#" data-act="ovw">Oppdater</a>') + '</p>';
   }
   el.innerHTML = h;
 }
@@ -3057,7 +3099,7 @@ const PD = {key: ''};
 async function posDepth(){
   const k = pkey(S.pos.lat, S.pos.lon);
   const paint = () => { const v = PDC.get(k), txt = !v || v.part ? ' · henter dybde …' : v.d ? ' · dybde ' + fmt(v.d[0], v.d[0] < 1 ? 1 : 0) + '–' + fmt(v.d[1], 0) + ' m' + (v.b ? ' · ' + v.b.toLowerCase() : '') : v.derr ? '' : ' · på land eller utenfor dybdekartet';
-    ['posDep', 'coordDep'].forEach(id => { const el = document.getElementById(id); if (el) el.textContent = txt; }); };
+    const el = document.getElementById('coordDep'); if (el) el.textContent = txt; };
   if (sparOn() && !TUR.on && !(PDC.has(k) && !PDC.get(k).part)) return;
   paint(); if (PD.key === k) return; PD.key = k;
   try { await pointInfo(S.pos.lat, S.pos.lon); } catch(e){}
@@ -3065,25 +3107,23 @@ async function posDepth(){
 }
 function renderKart(){
   const reg = REG(), p = S.pos, m = nowM;
-  let h = '<div class="posbar"><h2>' + esc(p.name || 'Valgt punkt') + '</h2><span class="muted">' + dms(p.lat, 'N', 'S') + ' · ' + dms(p.lon, 'Ø', 'V') + '<span id="posDep" class="pdv"></span> · ' + esc(reg.navn) + '</span>' +
-    '<button class="btn" data-act="geo">Min posisjon</button><button class="btn" data-act="reload">Oppdater</button></div>';
-  h += '<div class="regbar" style="margin-bottom:12px"><label for="regSelK">Område</label><select id="regSelK" data-chg="reg">' + R.regions.map(r => '<option value="' + r.id + '"' + (r.id === reg.id ? ' selected' : '') + '>' + esc(r.navn) + '</option>').join('') + '</select><label>Sted</label>' + placeSel() + '<span class="auto">… eller trykk i kartet for å velge punkt</span><span class="znote" id="zone">' + esc(zoneNotice()) + '</span></div>';
+  let h = '';
+  h += '<div class="regbar" style="margin-bottom:12px"><label for="regSelK">Område</label><select id="regSelK" data-chg="reg">' + R.regions.map(r => '<option value="' + r.id + '"' + (r.id === reg.id ? ' selected' : '') + '>' + esc(r.navn) + '</option>').join('') + '</select><label>Sted</label>' + placeSel() + '<button class="btn geo" data-act="geo" title="Hent posisjonen din fra GPS">Min posisjon</button><span class="znote" id="zone">' + esc(zoneNotice()) + '</span></div>';
   h += '<div class="kgrid"><div class="kmap' + (BIG.kart ? ' big' : '') + '">' + turHtml() + '<div id="mapSlot"></div><div class="turbar" id="turBar" hidden></div><div class="mapbar"><div class="tg" role="group" aria-label="Kartlag">' + BASES.map(([k, n]) => '<button data-base="' + k + '" class="' + (S.base === k ? 'on' : '') + '">' + n + '</button>').join('') + '</div><label class="chk"><input type="checkbox" data-chg="akva"' + (S.akva ? ' checked' : '') + '> Oppdrett og 100 m</label><label class="chk"><input type="checkbox" data-chg="bunn"' + (S.bunn ? ' checked' : '') + '> Bunntype</label><label class="chk"><input type="checkbox" data-chg="drift"' + (S.driftOn ? ' checked' : '') + '> Drift</label>' + (TUR.on ? '' : '<button class="btn pri" data-act="turstart">Start tur</button>') + '<span class="zone" id="dypHint"></span><span class="zone" id="aqInfo"></span><span class="coord">' + fmt(p.lat, 4) + ' N, ' + fmt(p.lon, 4) + ' Ø<span id="coordDep" class="pdv"></span></span></div>' + bunnLegend('bunnLeg', S.bunn) + '<div class="driftbar" id="driftBox" hidden></div><div id="profBox" class="profbox" hidden></div></div>' +
     '<div><div id="live"></div></div></div>';
   h += '<div id="liveCharts"></div><div id="tideFishBox"></div><div class="card" id="ovw" style="margin-top:14px"></div>';
-  h += '<div class="grid2" style="margin-top:14px">' + summaryCard(m, reg, 'Denne måneden der du er (' + reg.navn + ')') +
-    '<div class="card" id="r-data"><h3>' + esc(R.hav[3][0]) + '</h3><ul class="f">' + R.hav[3][1].map(x => '<li>' + esc(x[0]) + (x[1] ? src(x[1]) : '') + '</li>').join('') + '</ul><p class="note"><a href="#handbok" data-go="handbok">Sjøkartnull, tidevann og bølgehøyde forklart ›</a></p></div></div>';
+  h += '<div style="margin-top:14px">' + summaryCard(m, reg, 'Denne måneden der du er (' + reg.navn + ')') + '</div>';
   return h;
 }
 const allNet = () => Object.keys(LV.err).length === 6 && Object.values(LV.err).every(e => e instanceof NetErr);
 function paintLive(){
   const box = document.getElementById('live'), cb = document.getElementById('liveCharts'); if (!box || !cb) return;
   const tf0 = document.getElementById('tideFishBox'); if (tf0) tf0.innerHTML = '';
-  if (sparOn() && !LV.key){ box.innerHTML = '<div class="card"><h3>Strømsparing er på</h3><p style="margin:0">Live-data hentes bare når du trykker «Oppdater».</p></div>'; cb.innerHTML = ''; return; }
+  if (sparOn() && !LV.key){ box.innerHTML = '<div class="card"><h3>Strømsparing er på</h3><p style="margin:0">Live-data hentes bare når du ber om det.</p><p style="margin:10px 0 0"><button class="btn pri" data-act="reload">Hent live-data</button></p></div>'; cb.innerHTML = ''; return; }
   if (LV.busy && !LV.ocean && !LV.loc && !LV.tide){ box.innerHTML = '<div class="card"><div class="busy">Henter bølger, vind, temperatur og tidevann …</div></div>'; cb.innerHTML = ''; return; }
   if (allNet()){
     const inClaude = location.protocol !== 'file:';
-    box.innerHTML = '<div class="card fallback"><h3>Live-data kan ikke hentes her</h3><p style="margin:0">' + (inClaude ? 'Siden fikk ikke kontakt med MET og Kartverket. Inne i Claude-visningen blokkeres datakall til andre nettsteder. Åpne filen <b>fiskeguide.html</b> i nettleseren for bølger, vind, temperatur, tidevann og sjøkart.' : 'Fikk ikke kontakt med MET og Kartverket. Sjekk internettforbindelsen og trykk «Oppdater».') + '</p>' +
+    box.innerHTML = '<div class="card fallback"><h3>Live-data kan ikke hentes her</h3><p style="margin:0">' + (inClaude ? 'Siden fikk ikke kontakt med MET og Kartverket. Inne i Claude-visningen blokkeres datakall til andre nettsteder. Åpne filen <b>fiskeguide.html</b> i nettleseren for bølger, vind, temperatur, tidevann og sjøkart.' : 'Fikk ikke kontakt med MET og Kartverket. Sjekk internettforbindelsen.') + '</p>' + (inClaude ? '' : '<p style="margin:10px 0 0"><button class="btn pri" data-act="reload">Prøv igjen</button></p>') +
       '<h4>Direkte hos kildene</h4><ul class="f"><li><a href="https://www.yr.no/" target="_blank" rel="noopener">Yr</a> – vær og vind</li><li><a href="https://www.kartverket.no/til-sjos/se-havniva" target="_blank" rel="noopener">Kartverket: Se havnivå</a> – tidevann og vannstand</li><li><a href="https://www.barentswatch.no/bolgevarsel/" target="_blank" rel="noopener">BarentsWatch: bølgevarsel</a></li><li><a href="https://norgeskart.no/" target="_blank" rel="noopener">Norgeskart</a> – kart (sjøkart som kartlag)</li></ul></div>';
     cb.innerHTML = ''; return;
   }
@@ -3125,7 +3165,7 @@ function paintLive(){
   c += '<div class="chart" id="ch-tide"><h3>Tidevann og vannstand (48 t)</h3><div class="lg"><span style="color:#61cfd8"><i style="background:#61cfd8"></i>Vannstandsvarsel</span><span style="color:#8aa0ad"><i class="d" style="color:#8aa0ad"></i>Beregnet tidevann</span><span style="color:#f2c14e"><i style="background:#f2c14e"></i>Målt</span></div><div class="cv"></div><div class="meta" id="tideMeta"></div></div>';
   c += '<div class="chart" id="ch-wave"><h3>Bølgehøyde (48 t)</h3><div class="lg"><span style="color:#5aa9e6"><i style="background:#5aa9e6"></i>Bølgehøyde, m</span><span>Piler: retningen bølgene går</span></div><div class="cv"></div><div class="meta" id="waveMeta"></div></div>';
   c += '<div class="chart" id="ch-wind"><h3>Vind (48 t)</h3><div class="lg"><span style="color:#59d49c"><i style="background:#59d49c"></i>Middelvind</span><span style="color:#b9f0d4"><i class="d" style="color:#b9f0d4"></i>Vindkast</span><span>Piler: retningen vinden blåser</span></div><div class="cv"></div><div class="meta" id="windMeta"></div></div>';
-  c += '<div class="chart" id="ch-temp"><h3>Temperatur (48 t)</h3><div class="lg"><span style="color:#ff9f6b"><i style="background:#ff9f6b"></i>Luft</span><span style="color:#5aa9e6"><i style="background:#5aa9e6"></i>Sjø (modell)</span></div><div class="cv"></div></div>';
+  c += '<div class="chart" id="ch-temp"><h3>Temperatur (48 t)</h3><div class="lg"><span style="color:#ff9f6b"><i style="background:#ff9f6b"></i>Luft</span><span style="color:#5aa9e6"><i style="background:#5aa9e6"></i>Sjø (modell)</span></div><div class="cv"></div><div class="meta" id="tempMeta"></div></div>';
   c += '</div><div class="grid2" style="margin-top:14px"><div class="card tbl" id="tideTab"></div><div class="card tbl" id="hourTab"></div></div>';
   cb.innerHTML = c;
   drawCharts(); tables();
@@ -3181,8 +3221,7 @@ function drawCharts(){
     const yr = yRange(vals, 0.3, 20, false);
     put('ch-tide', chartSvg({w: W('ch-tide'), h: 240, t0, t1, y0: yr[0], y1: yr[1], now, unit: 'cm', label: 'Tidevann og vannstand', marks,
       series: [{pts: P(s.prediction), col: '#8aa0ad', dash: '5 4', w: 1.6, gap: 3600e3}, {pts: P(s.forecast), col: '#61cfd8', w: 2.4, area: 'rgba(97,207,216,.10)', gap: 3600e3}, {pts: P(s.observation), col: '#f2c14e', w: 2.4, gap: 3600e3}]}));
-    const lc = LV.tide.loc, delay = +lc.delay || 0, fac = +lc.factor || 1;
-    const meta = document.getElementById('tideMeta'); if (meta) meta.innerHTML = 'Kartverket: ' + esc(lc.descr || ('Tidevann fra ' + (lc.name || '?'))) + (delay || fac !== 1 ? ' (tidsforskyvning ' + fmt(delay, 0) + ' min, høydefaktor ' + fmt(fac, 2) + ')' : '') + '. Høyder i cm over sjøkartnull.' + src(['kv_tide']);
+    const meta = document.getElementById('tideMeta'); if (meta) meta.innerHTML = 'Kilde: ' + src(['kv_tide']);
   } else put('ch-tide', none(LV.busy ? 'Henter …' : (LV.err.tide ? LV.err.tide.message : 'Ikke tilgjengelig')));
   if (LV.ocean){ const os = oceanSeries(), pts = os.map(x => [x.t, x.d.sea_surface_wave_height]), win = pts.filter(p => p[0] >= t0 && p[0] <= t1).map(p => p[1]);
     const ymax = Math.max(1, Math.max(...win.filter(v => v != null), 0) * 1.25);
@@ -3190,8 +3229,7 @@ function drawCharts(){
     put('ch-wave', chartSvg({w: W('ch-wave'), h: 220, t0, t1, y0: 0, y1: ymax, now, unit: 'm', label: 'Bølgehøyde', arrows,
       refs: R.sjo.filter(x => x[0] >= 3 && x[0] <= 6).map(x => ({v: x[3], label: x[2] + ' fra ' + fmtT(x[3]) + ' m', col: '#6f8797'})),
       series: [{pts, col: '#5aa9e6', w: 2.4, area: 'rgba(90,169,230,.14)'}]}));
-    const g = LV.ocean.geometry.coordinates, dist = km([g[1], g[0]], [S.pos.lat, S.pos.lon]);
-    const meta = document.getElementById('waveMeta'); if (meta) meta.innerHTML = 'MET Oceanforecast, modellpunkt ' + fmt(g[1], 3) + ' N, ' + fmt(g[0], 3) + ' Ø' + (dist > 0.05 ? ' (' + fmt(dist, dist < 10 ? 1 : 0) + ' km fra valgt punkt)' : '') + ' · oppdatert ' + tm(Date.parse(LV.ocean.properties.meta.updated_at)) + '.' + src(['met_ocean']);
+    const meta = document.getElementById('waveMeta'); if (meta) meta.innerHTML = 'Kilde: ' + src(['met_ocean']);
   } else put('ch-wave', none(LV.busy ? 'Henter …' : (LV.err.ocean ? LV.err.ocean.message : 'Ikke tilgjengelig')));
   if (LV.loc){ const ls = locSeries().filter(x => x.t <= t1 + 3600e3);
     const mean = ls.map(x => [x.t, x.d.wind_speed]), gust = ls.map(x => [x.t, x.d.wind_speed_of_gust]);
@@ -3201,7 +3239,8 @@ function drawCharts(){
     put('ch-wind', chartSvg({w: W('ch-wind'), h: 220, t0, t1, y0: 0, y1: ymax, now, unit: 'm/s', label: 'Vind', arrows,
       refs: [[5, 'Frisk bris 8,0'], [6, 'Liten kuling 10,8'], [7, 'Stiv kuling 13,9'], [8, 'Sterk kuling 17,2']].map(x => ({v: R.beaufort[x[0]][2], label: x[1], col: x[0] >= 6 ? '#c9962e' : '#6f8797'})),
       series: [{pts: gust, col: '#b9f0d4', dash: '4 3', w: 1.6}, {pts: mean, col: '#59d49c', w: 2.4, area: 'rgba(89,212,156,.10)'}]}));
-    const meta = document.getElementById('windMeta'); if (meta) meta.innerHTML = 'MET Locationforecast · oppdatert ' + tm(Date.parse(LV.loc.properties.meta.updated_at)) + '.' + src(['met_loc']);
+    const meta = document.getElementById('windMeta'); if (meta) meta.innerHTML = 'Kilde: ' + src(['met_loc']);
+    const tmeta = document.getElementById('tempMeta'); if (tmeta) tmeta.innerHTML = 'Kilde: ' + srcU(['met_loc', 'met_ocean']);
     const at = ls.map(x => [x.t, x.d.air_temperature]), stv = LV.ocean ? oceanSeries().map(x => [x.t, x.d.sea_water_temperature]) : [];
     const tv = at.concat(stv).filter(p => p[0] >= t0 && p[0] <= t1).map(p => p[1]), yr = yRange(tv, 0.15, 4, false);
     put('ch-temp', chartSvg({w: W('ch-temp'), h: 200, t0, t1, y0: Math.floor(yr[0]), y1: Math.ceil(yr[1]), now, unit: '°C', label: 'Temperatur',
@@ -3215,7 +3254,7 @@ function tables(){
     if (ev.length){ const byDay = {}; ev.forEach(x => { const k = dayLbl(x.t); (byDay[k] = byDay[k] || []).push(x); });
       tt.innerHTML = '<h3>Flo og fjære</h3><table><thead><tr><th>Tid</th><th></th><th class="n">cm over sjøkartnull</th></tr></thead><tbody>' +
         Object.keys(byDay).map(k => '<tr><td colspan="3" style="padding-top:12px;color:var(--text);font-weight:800">' + esc(cap(k)) + '</td></tr>' + byDay[k].map(x => '<tr' + (x.t < now ? ' style="opacity:.5"' : '') + '><td>' + tm(x.t) + '</td><td>' + (x.f === 'high' ? '<em class="chip g">Flo</em>' : '<em class="chip w">Fjære</em>') + '</td><td class="n"><b>' + fmt(x.v, 0) + '</b></td></tr>').join('')).join('') +
-        '</tbody></table><p class="note">Beregnet tidevann (uten værets virkning) fra Kartverket.</p>';
+        '</tbody></table><p class="note">Kilde: ' + src(['kv_tide']) + '</p>';
     } else tt.innerHTML = '<h3>Flo og fjære</h3><p class="note" style="margin-top:0">' + esc(LV.busy ? 'Henter …' : (LV.err.tab ? LV.err.tab.message : 'Ikke tilgjengelig')) + '</p>';
   }
   if (ht){
@@ -3224,10 +3263,10 @@ function tables(){
     const start = Math.ceil(now / 3600e3) * 3600e3;
     for (let t = start; t <= start + 45 * 3600e3; t += 3600e3){ if (+fH.format(new Date(t)) % 3) continue; const a = ls.find(x => x.t === t), o = os.find(x => x.t === t); if (a || o) rows.push([t, a, o]); if (rows.length >= 15) break; }
     let lastDay = '';
-    ht.innerHTML = '<h3>Neste døgn, hver 3. time</h3><table><thead><tr><th>Tid</th><th class="n">Vind (kast)</th><th class="n">Bølger</th><th class="n">Periode</th><th class="n">Luft</th><th class="n">Nedbør</th></tr></thead><tbody>' +
+    ht.innerHTML = '<h3>Neste døgn, hver 3. time</h3><table><thead><tr><th>Tid</th><th class="n">Vind m/s (kast)</th><th class="n">Bølger</th><th class="n">Periode</th><th class="n">Luft</th><th class="n">Nedbør mm</th></tr></thead><tbody>' +
       rows.map(([t, a, o]) => { const d = dayLbl(t), first = d !== lastDay; lastDay = d; const pr = a && (a.n1 || a.n6), prv = pr && pr.details ? pr.details.precipitation_amount : null;
-        return '<tr><td>' + (first ? '<b>' + esc(d.split(' ')[0]) + '</b> ' : '') + tm(t) + '</td><td class="n">' + (a ? fmt(a.d.wind_speed, 0) + ' (' + fmt(a.d.wind_speed_of_gust, 0) + ') ' + compass(a.d.wind_from_direction) : '–') + '</td><td class="n">' + (o ? fmt(o.d.sea_surface_wave_height, 1) + ' m' : '–') + '</td><td class="n">' + ((w => w && w.d.tp != null ? fmt(w.d.tp, 0) + ' s' : '–')(LV.om ? omSeries(LV.om).find(x => x.t === t) : null)) + '</td><td class="n">' + (a ? fmt(a.d.air_temperature, 0) + '°' : '–') + '</td><td class="n">' + (prv != null ? fmt(prv, 1) + (a.n1 ? '' : '*') : '–') + '</td></tr>'; }).join('') +
-      '</tbody></table><p class="note">Vind i m/s, retning den kommer fra. Nedbør i mm neste time (* = neste 6 timer). Bølger fra MET-modellpunktet; periode fra Open-Meteo.</p>';
+        return '<tr><td>' + (first ? '<b>' + esc(d.split(' ')[0]) + '</b> ' : '') + tm(t) + '</td><td class="n">' + (a ? fmt(a.d.wind_speed, 0) + ' (' + fmt(a.d.wind_speed_of_gust, 0) + ') ' + compass(a.d.wind_from_direction) : '–') + '</td><td class="n">' + (o ? fmt(o.d.sea_surface_wave_height, 1) + ' m' : '–') + '</td><td class="n">' + ((w => w && w.d.tp != null ? fmt(w.d.tp, 0) + ' s' : '–')(LV.om ? omSeries(LV.om).find(x => x.t === t) : null)) + '</td><td class="n">' + (a ? fmt(a.d.air_temperature, 0) + '°' : '–') + '</td><td class="n">' + (prv != null ? fmt(prv, 1) + (a.n1 ? '' : '<span title="Neste 6 timer">*</span>') : '–') + '</td></tr>'; }).join('') +
+      '</tbody></table><p class="note">Kilde: ' + srcU(['met_loc', 'met_ocean', 'openmeteo']) + '</p>';
   }
 }
 let rz = null;
@@ -3492,7 +3531,7 @@ function onFix(p){
   const sog = c.speed != null && !isNaN(c.speed) ? c.speed : (dt > 3 ? km(f0.p, pt) * 1000 / dt : null);
   const okSog = sog != null && sog * 1.94384 < 60; TUR.sog = okSog ? sog : (c.speed == null ? TUR.sog : sog); if (okSog && sog * 1.94384 > TUR.vmax) TUR.vmax = sog * 1.94384;
   TUR.cog = c.heading != null && !isNaN(c.heading) && sog > 0.3 ? c.heading : (dt > 3 && km(f0.p, pt) * 1000 > 8 ? bearing(f0.p, pt) : TUR.cog);
-  TUR.last = pt; TUR.acc = c.accuracy; TUR.err = null;
+  TUR.last = pt; TUR.acc = c.accuracy; TUR.err = null; Object.assign(GEO, {p: pt, t: Date.now(), acc: c.accuracy});
   const r = route(); if (r.length && TUR.wpIdx == null) TUR.wpIdx = 0;
   if (r.length && TUR.wpIdx < r.length && km(pt, [r[TUR.wpIdx].lat, r[TUR.wpIdx].lon]) * 1000 < 60) TUR.wpIdx++;
   if (map && window.L){ const Lf = window.L;
@@ -3507,7 +3546,7 @@ function onFix(p){
   /* oppdater vær og tidevann når båten har flyttet seg langt eller det har gått en stund */
   if (km(pt, [S.pos.lat, S.pos.lon]) > 3 || Date.now() - TUR.posAt > 15 * 60e3){ TUR.posAt = Date.now(); S.pos = {lat: r4(pt[0]), lon: r4(pt[1]), name: 'Båten', own: true}; S.reg = regionFor(pt[0], pt[1]); S.regAuto = true; save(); loadLive(false); zoneCheck(); }
   if (S.driftOn && Date.now() - (DR.at || 0) > 30000){ DR.at = Date.now(); drawDrift(pt); }
-  paintTur();
+  profLive(); paintTur();
 }
 async function depthCheck(pt){
   const minGap = sparOn() ? 60000 : 8000;
@@ -3674,7 +3713,7 @@ function mountMap2(){
 function fsBase(k){ if (!map2 || !FS.bases[k]) return; Object.values(FS.bases).forEach(l => map2.removeLayer(l)); FS.bases[k].addTo(map2); FS.base = k; fsSave(); document.querySelectorAll('[data-fsbase]').forEach(b => b.classList.toggle('on', b.dataset.fsbase === k)); }
 function renderSteder(){
   const m = fsMonth(), sp = ORDER.filter(k => ['blakveite','krabbe'].indexOf(k) < 0);
-  let h = '<h2 class="sec-title">Fiskesteder</h2><p class="lead">Fargede felt er fiskeplasser og gyteområder registrert av Fiskeridirektoratet gjennom intervju med lokale fiskere, og gytefelt for kysttorsk kartlagt av Havforskningsinstituttet. Prikkene er lokale tips med kilde. Fargen viser arten.' + src(['fd_fiskeplasser','fd_kystnaere']) + '</p>';
+  let h = '<h2 class="sec-title">Fiskesteder</h2>';
   h += '<div class="card fsctl"><div class="chips l">' + sp.map(k => '<button class="fsc' + (FS.sel.indexOf(k) >= 0 ? ' on' : '') + '" data-act="fssp" data-k="' + k + '" style="--c:' + ART[k].col + '"><i></i>' + esc(ART[k].no) + '</button>').join('') + '<button class="fsc' + (FS.sel.indexOf('andre') >= 0 ? ' on' : '') + '" data-act="fssp" data-k="andre" style="--c:#8a9aa6"><i></i>Andre arter</button>' + (FS.sel.length ? '<button class="btn" data-act="fsall">Vis alle arter</button>' : '') + '</div>' +
     '<div class="drow" style="margin-top:10px"><label>Måned <select data-chg="fsmon"><option value="now"' + (FS.mon === 'now' ? ' selected' : '') + '>Denne måneden (' + MON[nowM] + ')</option><option value="all"' + (FS.mon === 'all' ? ' selected' : '') + '>Alle måneder</option>' + MI.map(i => '<option value="' + i + '"' + (FS.mon === String(i) ? ' selected' : '') + '>' + cap(MON[i]) + '</option>').join('') + '</select></label>' +
     FSL.map(([k, n]) => '<label class="chk"><input type="checkbox" data-chg="fslay" data-k="' + k + '"' + (FS.lay[k] ? ' checked' : '') + '> ' + esc(n) + '</label>').join('') + '<label class="chk"><input type="checkbox" data-chg="fslay" data-k="tips"' + (FS.lay.tips ? ' checked' : '') + '> Lokale tips</label><label class="chk"><input type="checkbox" data-chg="fslay" data-k="algo"' + (FS.lay.algo ? ' checked' : '') + '> ★ Algoritmeforslag</label><label class="chk"><input type="checkbox" data-chg="fslay" data-k="bunn"' + (FS.lay.bunn ? ' checked' : '') + '> Bunntype (NGU)</label></div></div>';
@@ -3687,15 +3726,6 @@ function renderSteder(){
     '<li>Mange registreringer er gamle (1980–2000-tallet) – årstallet står i boblen. Fiskeplassene er yrkesfiskernes, ikke garanti for fisk.</li>' +
     '<li>Respekter fredning, stengte gytefelt og 100 m fra oppdrettsanlegg. Gytefelt for torsk på Vestlandet er ikke stengt, men gytende fisk er sårbar.' + src(['hi_kysttorsk_s']) + '</li></ul></div>' +
     '<div class="card"><h3>Dyp og årstid' + (tipsSp.length ? ' for ' + esc(tipsSp.map(k => ART[k].no).join(', ')) : '') + '</h3>' + (tipsSp.length ? '<ul class="f">' + tipsSp.map(k => { const ph = phaseNow(k, m == null ? nowM : m, REG()); const dyp = (R.aar[k] || []).find(p => /\d+\s*–\s*\d+ m|\d+ m/.test(p.t) && p.a === 1 && p.b === 12); return '<li><b>' + esc(ART[k].no) + ':</b> ' + esc(ph ? ph.t : (dyp ? dyp.t : ART[k].kort)) + src(ph ? ph.s : dyp ? dyp.s : []) + '</li>'; }).join('') + '</ul><p class="note">Bytt til «Dybdekart» og zoom inn for å se dybdeområdene.</p>' : '<p class="note" style="margin-top:0">Velg én eller flere arter over for å se hvor de står denne måneden.</p>') + '</div></div>';
-  if (FS.lay.algo) h += '<div class="card" style="margin-top:14px"><h3>★ Slik virker algoritmeforslagene</h3><ul class="f">' +
-    '<li>Siden deler kartet i faste ruter på 6 × 6 km og henter Kartverkets dybdekart for hver rute i full oppløsning (ca. 5 m – finere gir ikke flere detaljer i dybdekartet). Ut fra hvordan dybden endrer seg rundt hvert punkt regnes det ut om det ligger på en bratt kant (og om det er på toppen eller ved foten), på et nebb eller en odde av en kant, på en topp eller en liten forhøyning, i en grop, på flat bunn, nær dypere vann eller nær land.' + src(['kv_dybde']) + '</li>' +
-    '<li>Hver rute regnes ut én gang og huskes i nettleseren, så et sted får alltid samme poeng: forslagene flytter seg ikke når du zoomer. Zoomer du inn, kan flere forslag dukke opp i utsnittet, mens de du allerede ser, blir liggende. Forslagene vises når utsnittet trenger høyst ' + AMAXT + ' nye ruter – typisk zoomnivå 13 på PC og 12 på mobil.</li>' +
-    '<li>Hvert punkt får poeng per art: hvor godt dybden passer artens vanlige dyp den måneden, og hvor godt bunnformen passer artens vaner – for eksempel bunnen av skrenter for lange, topper, nebb og grunner for sei, kantene rundt grunntopper for lyr om vinteren, flater nær dypere vann for lysing, og grunne topper og sandsletter med struktur for kveite. Fiskeskolens kartskisser over typiske plasser er brukt som ekstra referanse for vektingen, ikke som fasit.' + src(['njff_salt','njff_lange','njff_lysing','njff_lyr','hk_kveite','seeberg_fs']) + '</li>' +
-    '<li>De beste punktene vises som ★ i artens farge: to per art, eller seks når du har valgt én eller flere arter. Dybden i hvert forslag kontrolleres hos Kartverket, og forslag der den faktiske dybden ikke passer, tas bort. Ligger punktet i en fiskeplass fiskerne har registrert for samme art og måned, får det ekstra poeng. Punkter nærmere enn ca. 120 m fra oppdrett tas bort (fiske er forbudt innen 100 m).' + src(['fd_fiskeplasser','akva18']) + '</li>' +
-    '<li>Der NGU har kartlagt bunntypen (detaljert, 1:20 000 – bl.a. rundt Florø og Ålesund, men ikke i Bergen-området), brukes den også: hvitting, hyse, piggskate og lysing får ekstra poeng på slam, lyr, brosme og hummer på stein og fjell, kveite på sand og grus, og lange på hard bunn og overgangen mellom hard og myk bunn. Der bunnen ikke passer, trekkes det fra.' + src(['ngu_sed','njff_hvitting','njff_lysing','njff_lange','hk_kveite']) + '</li>' +
-    '<li>' + esc(R.algoUt) + ' Fredede og forbudte forslag – for eksempel kveite sør for 62° N, hummer utenfor sesongen og vanlig uer – har rød stiplet ring og varsel i boblen.</li>' +
-    '<li>Trykk på en stjerne og velg «Legg til på sjøkart» for å få plassen som et punkt på kartet under «Kart og vær». Der kan du trykke på punktet og velge «Fjern fiskeplass».</li>' +
-    '<li><b>Usikkerhet:</b> forslagene er beregnet fra dybdekart, ikke fra fangst, og algoritmen er ikke testet mot faktiske fangster. Dybden kommer i intervaller (f.eks. 50–100 m), og noen områder har bare grove intervaller. Strøm og temperatur er ikke med, og bunntypen bare der NGU har kartlagt. Bruk forslagene som et sted å begynne å lete – med ekkolodd. Med dybdeprofil-knappen i kartet kan du se bunnen langs en strek før du drar.</li></ul></div>';
   h += '<p class="note">' + esc(R.tipsNote) + ' Data hentes direkte fra Fiskeridirektoratet og Kartverket når kartet flyttes.</p>';
   return h;
 }
@@ -3756,7 +3786,7 @@ function dilate(M, GW, GH, r){
 }
 function algoParams(sp, m, lat, lon){
   const A = R.algo[sp]; if (!A) return null;
-  let P = {core: A.core, range: A.range, w: A.w, varsel: '', fredet: ''};
+  let P = {core: A.core, range: A.range, w: A.w, b: A.b || null, varsel: '', fredet: ''};
   if (A.mnd) Object.keys(A.mnd).forEach(k => { const [a, b] = k.split('-').map(Number); if (inMon(a, b, m + 1)) P = Object.assign({}, P, A.mnd[k]); });
   const rid = regionFor(lat, lon), rg = R.regions.find(r => r.id === rid) || {};
   if (ART[sp].omr && ART[sp].omr.indexOf(rid) < 0) return {skip: 'ikke vanlig i dette området'};
@@ -3783,7 +3813,7 @@ function depthFit(d, P){
    10 m per bildepunkt (ca. 5 m på 60° N – der Kartverkets dybdelag slutter å vise nye detaljer) og lagres.
    Samme sted får derfor alltid samme poeng: forslagene flytter seg ikke når du zoomer. Zoomer du inn, kan
    flere forslag dukke opp i utsnittet, men de du allerede ser, blir liggende. */
-const ALV = 'a8', ACELL = 10, ATILE = 6000, AMAXT = 24, AKEEP = 8;
+const ALV = 'a11', ACELL = 10, ATILE = 6000, AMAXT = 24, AKEEP = 8;
 const ATC = new Map(), ATP = new Map(), AVER = new Map();
 (function(){ try { const o = JSON.parse(localStorage.getItem('fg_alg') || 'null'); if (o && o.v === ALV) o.t.forEach(t => ATC.set(t.k, t)); } catch(e){} })();
 let atSaveT = null;
@@ -3806,13 +3836,40 @@ function atGet(tx, ty, m){
   const pr = atCompute(tx, ty, m).then(t => { ATC.set(k, t); ATP.delete(k); atSave(); return t; }, e => { ATP.delete(k); throw e; });
   ATP.set(k, pr); return pr;
 }
+/* smale sund: sjøpunkter med land på begge sider innen kort avstand, der vannet åpner seg igjen i begge ender langs sundet.
+   LA = landmaske (1 = land), step = meter per rute, m0/nIn = rutas indre del. Gir s (0–255, smalere = høyere) og w (bredde i tiere av meter).
+   At strømmen er sterkere i sund, er en vanlig tommelfingerregel – den er ikke målt her. */
+function sundGrid(LA, nL, step, m0, nIn){
+  const CAP = 255, DIRS = [[1, 0], [1, 1], [0, 1], [-1, 1], [-1, 0], [-1, -1], [0, -1], [1, -1]], N = nL * nL;
+  const dist = DIRS.map(([dx, dy]) => { const D = new Uint8Array(N);
+    const j0 = dy > 0 ? nL - 1 : 0, j1 = dy > 0 ? -1 : nL, js = dy > 0 ? -1 : 1, i0 = dx > 0 ? nL - 1 : 0, i1 = dx > 0 ? -1 : nL, is = dx > 0 ? -1 : 1;
+    for (let j = j0; j !== j1; j += js) for (let i = i0; i !== i1; i += is){ const c = j * nL + i; if (LA[c]) continue;
+      const ni = i + dx, nj = j + dy; D[c] = ni < 0 || nj < 0 || ni >= nL || nj >= nL ? CAP : Math.min(CAP, D[nj * nL + ni] + 1); }
+    return D; });
+  const len = k => step * (k % 2 ? Math.SQRT2 : 1), S = new Uint8Array(N), Wd = new Uint8Array(N), OPEN = [600, 1200, 2000];
+  const width = (k, c) => { const a = dist[k][c], b = dist[k + 4][c]; return a >= CAP || b >= CAP ? Infinity : (a + b) * len(k); };
+  for (let j = Math.max(0, m0 - 2); j < Math.min(nL, m0 + nIn + 2); j++) for (let i = Math.max(0, m0 - 2); i < Math.min(nL, m0 + nIn + 2); i++){
+    const c = j * nL + i; if (LA[c]) continue; let best = 0, bw = 0;
+    for (let k = 0; k < 4; k++){ const w = width(k, c); if (w > 1500) continue;
+      const sc = 1 - clamp01((w - 300) / 1200); if (sc <= best) continue;
+      /* langs sundet (vinkelrett på aksen): vannet må bli tydelig bredere i begge ender før det kommer land */
+      let ok = true;
+      for (const q of [(k + 2) % 8, (k + 6) % 8]){ const [qx, qy] = DIRS[q], dq = dist[q][c], lq = len(q); let open = false;
+        for (const sm of OPEN){ const n = Math.round(sm / lq); if (dq < n) break;
+          const ii = i + qx * n, jj = j + qy * n; if (ii < 0 || jj < 0 || ii >= nL || jj >= nL){ open = true; break; }
+          if (width(k, jj * nL + ii) >= Math.max(1.4 * w, w + 250)){ open = true; break; } }
+        if (!open){ ok = false; break; } }
+      if (ok){ best = sc; bw = w; } }
+    S[c] = Math.round(best * 255); Wd[c] = Math.min(255, Math.round(bw / 10)); }
+  return {s: S, w: Wd};
+}
 async function atCompute(tx, ty, m){
   const Lf = window.L, x0 = tx * ATILE, y0 = ty * ATILE, x1 = x0 + ATILE, y1 = y0 + ATILE;
   const [latC, lonC] = unmerc((x0 + x1) / 2, (y0 + y1) / 2), cosL = Math.cos(latC * D2R), cellM = ACELL * cosL;
   const n = ATILE / ACELL, mC = Math.ceil(700 / cellM), W = n + 2 * mC, H = W, bx = [x0 - mC * ACELL, y0 - mC * ACELL, x1 + mC * ACELL, y1 + mC * ACELL];
   const q = (bb, w, h) => '?service=WMS&version=1.1.1&request=GetMap&styles=&srs=EPSG:3857&format=image/png&transparent=true&width=' + w + '&height=' + h + '&bbox=' + bb.map(v => v.toFixed(1)).join(',');
   /* landareal grovere (40 m) med 1 km ekstra kant: skiller land fra sjø uten dybdedata */
-  const LC = 40, mL = Math.ceil(1700 / (LC * cosL)), nL = ATILE / LC + 2 * mL, bl = [x0 - mL * LC, y0 - mL * LC, x1 + mL * LC, y1 + mL * LC];
+  const LC = 40, mL = Math.ceil(2300 / (LC * cosL)), nL = ATILE / LC + 2 * mL, bl = [x0 - mL * LC, y0 - mL * LC, x1 + mL * LC, y1 + mL * LC];
   const sw = unmerc(bx[0], bx[1]), ne = unmerc(bx[2], bx[3]), lb = Lf.latLngBounds(sw, ne);
   const wfs = (svc, typ) => wfsBounds(svc, typ, lb).catch(() => null);
   const [dd, bd, ld, akF, akP, pasF] = await Promise.all([wmsImg(DYB + q(bx, W, H) + '&layers=Dybdelag', W, H), wmsImg(NGU + q(bx, W, H) + '&layers=NiN_DK_Det', W, H).catch(() => null),
@@ -3822,10 +3879,13 @@ async function atCompute(tx, ty, m){
     if (dd[k + 3] > 200){ const iv = depthOf(dd[k]); if (iv){ DA[c] = iv[0]; DB[c] = iv[1]; D[c] = (iv[0] + iv[1]) / 2; } } else LAND[c] = 1;
     if (bd && bd[k + 3] > 200 && !isNaN(D[c])) BT[c] = bunnOf(bd[k], bd[k + 1], bd[k + 2]); }
   /* tomt i dybdekartet = land, men bare innen ca. 1 km fra Kartverkets landareal – ellers mangler det bare dybdedata */
-  if (ld){ const LA = new Uint8Array(nL * nL); for (let c = 0; c < nL * nL; c++) if (ld[c * 4 + 3] > 40) LA[c] = 1;
-    const A = dilate(LA, nL, nL, Math.max(1, Math.round(1000 / (LC * cosL)))), off = mL * LC - mC * ACELL;
+  let LA = null; const offL = mL * LC - mC * ACELL;
+  if (ld){ LA = new Uint8Array(nL * nL); for (let c = 0; c < nL * nL; c++) if (ld[c * 4 + 3] > 40) LA[c] = 1;
+    const A = dilate(LA, nL, nL, Math.max(1, Math.round(1000 / (LC * cosL)))), off = offL;
     for (let j = 0; j < H; j++) for (let i = 0; i < W; i++){ const c = j * W + i; if (!LAND[c]) continue;
       const ci = Math.floor((off + (i + .5) * ACELL) / LC), cj = Math.floor((off + (j + .5) * ACELL) / LC); if (!A[cj * nL + ci]) LAND[c] = 0; } }
+  /* smale sund (der tidevannsstrømmen ofte går sterkere): på landarealets rutenett */
+  const SU = LA ? sundGrid(LA, nL, LC * cosL, mL, ATILE / LC) : null;
   /* nabopunkter som faste forskyvninger (marginen er større enn største radius, så ingen grensesjekk trengs) */
   const rr = mt => Math.max(1, Math.round(mt / cellM)), r1 = rr(120), r2 = rr(400), r3 = rr(600), r4 = rr(100), r5 = rr(300);
   const dirs = Array.from({length: 16}, (_, a) => [Math.cos(a * Math.PI / 8), Math.sin(a * Math.PI / 8)]);
@@ -3848,12 +3908,14 @@ async function atCompute(tx, ty, m){
     fe.knoll = nr >= 12 ? clamp01((frac - .6) / .4) * clamp01((ringMean - d) / 10) : 0;   /* liten topp: 10 m grunnere enn rundt gir full score */
     fe.nose = top * clamp01((frac - .45) / .25);                                         /* nebb/odde: kant med dypere vann på flere sider */
     fe.basin = nr >= 12 ? clamp01((fracS - .6) / .4) * clamp01((d - ringMean) / 30) : 0; fe.flat = 1 - clamp01(Sd / 30); fe.neardeep = nd; fe.shore = sh;
+    fe.slake = clamp01((Sd - 5) / 10) * (1 - clamp01((Sd - 35) / 25));                  /* slak bakke: jevn helning, verken flat eller bratt */
+    if (SU){ const ci = Math.floor((offL + (c % W + .5) * ACELL) / LC), cj = Math.floor((offL + (((c / W) | 0) + .5) * ACELL) / LC), k = cj * nL + ci; fe.sund = SU.s[k] / 255; fe.sundW = SU.w[k] * 10; } else { fe.sund = 0; fe.sundW = 0; }
     fe.ringMean = ringMean; fe.d0 = d; fe.bt = BT[c]; fe.ov = ov; return true;
   }
   /* artene: dybdekrav og vekter for måneden; poeng per celle, beste celle i hver blokk på ca. 175 m */
   const sps = Object.keys(R.algo).map(sp => { const P = algoParams(sp, m, latC, lonC); if (!P || P.skip) return null;
     const w = Object.entries(P.w), wsum = w.reduce((a, x) => a + x[1], 0), bu = R.algo[sp].bunn;
-    return {sp, P, w, wsum, bu, half: Math.max(1, (P.core[1] - P.core[0]) / 2), mid: (P.core[0] + P.core[1]) / 2}; }).filter(Boolean);
+    return {sp, P, w, wsum, bu, bo: P.b ? Object.entries(P.b) : null, half: Math.max(1, (P.core[1] - P.core[0]) / 2), mid: (P.core[0] + P.core[1]) / 2}; }).filter(Boolean);
   const BS = Math.max(4, Math.round(175 / cellM)), nb = Math.ceil(n / BS), bestS = sps.map(() => new Float32Array(nb * nb).fill(-1)), bestC = sps.map(() => new Int32Array(nb * nb));
   const fe = {}; let nD = 0, nB = 0;
   for (let j = 0; j < n; j++){
@@ -3864,7 +3926,7 @@ async function atCompute(tx, ty, m){
       for (let s = 0; s < sps.length; s++){ const X = sps[s], fit = depthFit(d, X.P); if (fit <= 0) continue;
         let v = .15; for (let a = 0; a < X.w.length; a++) v += X.w[a][1] * fe[X.w[a][0]];
         const bm = X.bu && fe.bt ? (X.bu.pref.indexOf(fe.bt) >= 0 || (X.bu.overgang && fe.ov) ? 1.2 : X.bu.avoid && X.bu.avoid.indexOf(fe.bt) >= 0 ? .6 : .9) : 1;
-        let sc = fit * v / (.15 + X.wsum) * bm; if (wide) sc *= .6; sc += .03 * (1 - clamp01(Math.abs(d - X.mid) / X.half));
+        let sc = fit * v / (.15 + X.wsum) * bm; if (X.bo) for (let a = 0; a < X.bo.length; a++) sc *= 1 + X.bo[a][1] * fe[X.bo[a][0]]; if (wide) sc *= .6; sc += .03 * (1 - clamp01(Math.abs(d - X.mid) / X.half));
         if (sc > bestS[s][bi]){ bestS[s][bi] = sc; bestC[s][bi] = c; } } }
   }
   const ll = c => { const i = c % W, j = (c / W) | 0; return unmerc(bx[0] + (i + .5) * ACELL, bx[3] - (j + .5) * ACELL); };
@@ -3913,27 +3975,26 @@ async function algoRun(){
   const b = map2.getBounds(), m = fsMonth() == null ? nowM : fsMonth(), want = FS.sel.filter(k => R.algo[k]), list = want.length ? want : Object.keys(R.algo), K = want.length ? 6 : 2;
   const tl = viewTiles(b), run = ++AL.run; AL.view = null;
   const need = tl.filter(([tx, ty]) => !ATC.has(tkey(tx, ty, m)));
-  if (need.length > AMAXT || tl.length > 3 * AMAXT){ AL.busy = false; AL.err = null; AL.res = []; AL.note = 'Zoom inn for å få algoritmeforslag: de beregnes i full oppløsning (ca. 5 m), og utsnittet trenger ' + need.length + ' nye ruter på 6 × 6 km (maks ' + AMAXT + ' om gangen). Ruter du allerede har sett, huskes.'; fsDraw(); return; }
+  if (need.length > AMAXT || tl.length > 3 * AMAXT){ AL.busy = false; AL.err = null; AL.res = []; AL.note = 'Zoom inn for å få algoritmeforslag.'; fsDraw(); return; }
   AL.busy = true; AL.err = null;
-  if (need.length){ AL.note = 'Beregner algoritmeforslag i full oppløsning: 0 av ' + need.length + ' ruter …'; fsPaintInfo(); }
+  if (need.length){ AL.note = 'Beregner algoritmeforslag: 0 av ' + need.length + ' ruter …'; fsPaintInfo(); }
   let done = 0, err = null, next = 0;
   /* nærmeste ruter først, tre om gangen; avbryt nye ruter hvis kartet flyttes (påbegynte ruter fullføres og lagres) */
   const c0 = merc(b.getCenter().lat, b.getCenter().lng); need.sort((p, q2) => Math.hypot((p[0] + .5) * ATILE - c0[0], (p[1] + .5) * ATILE - c0[1]) - Math.hypot((q2[0] + .5) * ATILE - c0[0], (q2[1] + .5) * ATILE - c0[1]));
   await Promise.all([0, 1, 2].map(async () => { while (next < need.length && run === AL.run){ const [tx, ty] = need[next++];
     try { await atGet(tx, ty, m); } catch(e){ err = err || e; }
-    done++; if (run === AL.run){ AL.note = 'Beregner algoritmeforslag i full oppløsning: ' + done + ' av ' + need.length + ' ruter …'; fsPaintInfo(); } } }));
+    done++; if (run === AL.run){ AL.note = 'Beregner algoritmeforslag: ' + done + ' av ' + need.length + ' ruter …'; fsPaintInfo(); } } }));
   if (run !== AL.run) return;
   if (err && done && !tl.some(([tx, ty]) => ATC.has(tkey(tx, ty, m)))){ AL.busy = false; AL.res = []; AL.note = '';
     AL.err = err instanceof TypeError ? 'Fikk ikke hentet dybdedata fra Kartverket' + (FS.err ? '.' : ' – i Claude-visningen er datakall sperret; åpne fiskeguide.html i nettleseren.') : err.message; fsDraw(); return; }
   AL.note = 'Kontrollerer dybden for forslagene …'; fsPaintInfo();
   const res = await algoPick(b, m, list, K, run); if (!res || run !== AL.run) return;
   AL.res = res; AL.busy = false;
-  const ts = tl.map(([tx, ty]) => ATC.get(tkey(tx, ty, m))).filter(Boolean), nD = ts.reduce((a, t) => a + t.nD, 0), nB = ts.reduce((a, t) => a + t.nB, 0);
+  const ts = tl.map(([tx, ty]) => ATC.get(tkey(tx, ty, m))).filter(Boolean), nD = ts.reduce((a, t) => a + t.nD, 0);
   const skips = list.filter(sp => { const P = algoParams(sp, m, b.getCenter().lat, b.getCenter().lng); return P && P.skip; });
-  const nf = res.filter(r => r.fredet).length; AL.bunnCov = nD ? nB / nD : 0;
-  AL.note = !nD ? 'Ingen dybdedata i kartutsnittet – flytt kartet ut på sjøen.' : res.length ? 'Algoritmeforslag: ' + res.length + ' steder' + (nf ? ' (' + nf + ' fredet eller forbudt – vises for læring)' : '') + ' · beregnet i full oppløsning, så de ligger fast når du zoomer'
+  const nf = res.filter(r => r.fredet).length;
+  AL.note = !nD ? 'Ingen dybdedata i kartutsnittet – flytt kartet ut på sjøen.' : res.length ? 'Algoritmeforslag: ' + res.length + ' steder' + (nf ? ' (' + nf + ' fredet eller forbudt – vises for læring)' : '')
     : skips.length === list.length ? 'Ingen forslag' : 'Algoritmen fant ingen tydelige steder i kartutsnittet for ' + (want.length ? 'valgt art' : 'artene') + ' denne måneden.';
-  if (res.length) AL.note += AL.bunnCov > .02 ? ' · bunntype fra NGU brukt der den finnes (' + Math.round(AL.bunnCov * 100) + ' % av sjøen i utsnittet)' : ' · NGU har ikke detaljert bunntypekart her, så bunntype er ikke med';
   if (AL.feil) AL.note += ' · ' + AL.feil + ' tatt bort fordi dybden hos Kartverket ikke passet';
   if (err) AL.note += ' · noen ruter kunne ikke hentes';
   if (skips.length && want.length) AL.note += skips.length === list.length && !res.length ? ': ' + skips.map(sp => ART[sp].no + ': ikke vanlig i dette området').join('; ') + '.' : ' (' + skips.map(sp => ART[sp].no + ': ikke vanlig i dette området').join('; ') + ')';
@@ -3945,16 +4006,17 @@ function algoLines(r){
   out.push('Algoritmen ser etter ' + r.P.core[0] + '–' + r.P.core[1] + ' m for ' + esc(ART[r.sp].no.toLowerCase()) + (r.grov ? ' (Kartverket har bare et grovt dybdeintervall her)' : ''));
   if (fe.edge > .5) out.push('Bratt kant: fra ca. ' + fmt(fe.mn, 0) + ' til ' + fmt(fe.mx, 0) + ' m på et par hundre meter' + (fe.foot > .5 ? ', punktet ligger ved foten' : fe.top > .5 ? ', punktet ligger på toppen av kanten' : ''));
   if (fe.peak > .4) out.push('Topp eller grunne: ca. ' + fmt(fe.ringMean - fe.d0, 0) + ' m grunnere enn bunnen rundt (ca. 400 m unna)');
-  else if (fe.knoll > .5 && (r.P.w.knoll || 0) > 0) out.push('Liten topp eller forhøyning: ca. ' + fmt(fe.ringMean - fe.d0, 0) + ' m grunnere enn bunnen rundt');
-  if (fe.nose > .5 && (r.P.w.nose || 0) > 0) out.push('Nebb eller odde på en kant: dypere vann på flere sider – her samles ofte strøm og mat');
+  else if (fe.knoll > .5 && ((r.P.w.knoll || 0) > 0 || (r.P.b && r.P.b.knoll))) out.push('Liten topp eller forhøyning: ca. ' + fmt(fe.ringMean - fe.d0, 0) + ' m grunnere enn bunnen rundt');
+  if (fe.nose > .5 && ((r.P.w.nose || 0) > 0 || (r.P.b && r.P.b.nose))) out.push('Nebb eller odde på en kant: dypere vann på flere sider – her samles ofte strøm og mat');
   if (fe.basin > .4 && (r.P.w.basin || 0) > 0) out.push('Grop eller basseng: ca. ' + fmt(fe.d0 - fe.ringMean, 0) + ' m dypere enn bunnen rundt – her samles ofte mudder');
-  if (fe.flat > .7 && (r.P.w.flat || 0) > 0) out.push('Flat bunn');
+  if (fe.slake > .6 && (r.P.w.slake || 0) > 0) out.push('Slak bakke: bunnen skrår jevnt, ca. ' + fmt(fe.mn, 0) + '–' + fmt(fe.mx, 0) + ' m like rundt');
+  else if (fe.flat > .7 && (r.P.w.flat || 0) > 0) out.push('Flat bunn');
+  if (fe.sund > .4 && ((r.P.b && r.P.b.sund) || 0) > 0) out.push('Smalt sund (ca. ' + fmt(Math.round(fe.sundW / 50) * 50, 0) + ' m bredt) – her går tidevannsstrømmen ofte sterkere');
   if (fe.neardeep && (r.P.w.neardeep || 0) > 0) out.push('Nær dypere vann');
   if (fe.shore && (r.P.w.shore || 0) > 0) out.push(fe.shore === 1 ? 'Nær land (under ca. 100 m)' : 'Ca. 100–300 m fra land');
   const bu = R.algo[r.sp].bunn;
   if (fe.bt){ const ok = bu && (bu.pref.indexOf(fe.bt) >= 0 || (bu.overgang && fe.ov)), bad = bu && bu.avoid && bu.avoid.indexOf(fe.bt) >= 0;
     out.push('Bunntype (NGU): ' + esc(bunnNavn(fe.bt).toLowerCase()) + (bu ? (ok ? ' – passer: ' : bad ? ' – passer dårlig: ' : ' – ') + esc(ART[r.sp].no.toLowerCase()) + ' liker ' + esc(bu.t) + src(bu.s) : '') + src(['ngu_sed'])); }
-  else if (bu) out.push('<span class="pmut">Bunntype: ikke kartlagt av NGU her</span>');
   if (r.fp) out.push('Ligger i en fiskeplass fiskerne har registrert for ' + esc(ART[r.sp].no.toLowerCase()) + ' denne måneden (' + esc(r.fp) + ')');
   if (r.P.varsel) out.push('<span class="warn">' + esc(r.P.varsel) + '</span>');
   return out;
@@ -3962,7 +4024,7 @@ function algoLines(r){
 function algoWhy(r){
   const A = R.algo[r.sp], grad = r.sc >= .8 ? 'godt' : r.sc >= .6 ? 'middels' : 'svakt';
   return '<div class="pal"><b>Algoritmeforslag' + (r.rank ? ' nr. ' + r.rank : '') + ': ' + esc(ART[r.sp].no) + '</b><br><span class="pmut">Passer kriteriene ' + grad + '</span><ul class="pul">' + algoLines(r).map(t => '<li>' + t + '</li>').join('') + '</ul>' +
-    '<span class="pmut">Grunnlag: ' + esc(A.hvorfor) + '. Beregnet fra Kartverkets dybdekart i full oppløsning (ca. 5 m) – ikke fangstdata.' + (A.fs ? ' Fiskeskolens kartskisser over typiske plasser er brukt som ekstra referanse for vektingen, ikke som fasit.' : '') + '</span> ' + src(A.kilde) + '</div>';
+    '<span class="pmut">Grunnlag: ' + esc(A.hvorfor + (r.P.hvorfor ? '; ' + r.P.hvorfor : '')) + '.</span> ' + src(A.kilde) + '</div>';
 }
 function algoDraw(group){
   if (!FS.lay.algo || !window.L) return; const Lf = window.L, used = new Set(); AL.groups = [];
@@ -4060,7 +4122,7 @@ function render(){
   const v = view(); renderNav(v);
   $('#app').innerHTML = v.indexOf('art-') === 0 ? renderSpecies(v.slice(4)) : (VIEWS[v] || renderKart)();
   if (v === 'kart' || !VIEWS[v] && v.indexOf('art-') !== 0){ mountMap(); dypHint(); paintLive(); paintOverview(); paintAqua(); drawRoute(); drawSpots(); posDepth(); paintTur(); if (S.driftOn) drawDrift(); else paintDrift();
-    if (!sparOn() || TUR.on){ if (!LV.key || LV.key !== S.pos.lat + ',' + S.pos.lon) loadLive(false); if (S.pos.own && ZN.key !== S.pos.lat + ',' + S.pos.lon) zoneCheck(); if (S.akva && !AQ.feats.length && map) loadAqua(); } }
+    if (!sparOn() || TUR.on){ if (!LV.key || LV.key !== S.pos.lat + ',' + S.pos.lon || (!LV.busy && Date.now() - LV.at > 30 * 60e3)) loadLive(false); if (S.pos.own && ZN.key !== S.pos.lat + ',' + S.pos.lon) zoneCheck(); if (S.akva && !AQ.feats.length && map) loadAqua(); } }
   if (v === 'steder') mountMap2();
   bigSync();
   if (pending){ const el = document.getElementById(pending); pending = null; if (el){ if (el.tagName === 'DETAILS') el.open = true; el.scrollIntoView({block:'start'}); el.style.boxShadow = '0 0 0 2px var(--link)'; } }
@@ -4080,7 +4142,7 @@ document.addEventListener('click', e => {
   else if (d.act === 'geo'){
     if (!navigator.geolocation){ alertBox('Nettleseren gir ikke tilgang til posisjon.'); return; }
     a.textContent = 'Finner posisjon …';
-    navigator.geolocation.getCurrentPosition(p => setPos(p.coords.latitude, p.coords.longitude, 'Min posisjon', true), err => { a.textContent = 'Min posisjon'; alertBox('Fikk ikke posisjonen (' + (err && err.message || 'avslått') + '). Trykk i kartet i stedet.'); }, {enableHighAccuracy: true, timeout: 12000, maximumAge: 60000});
+    navigator.geolocation.getCurrentPosition(p => { Object.assign(GEO, {p: [p.coords.latitude, p.coords.longitude], t: Date.now(), acc: p.coords.accuracy}); setPos(p.coords.latitude, p.coords.longitude, 'Min posisjon', true); profLive(); }, err => { a.textContent = 'Min posisjon'; alertBox('Fikk ikke posisjonen (' + (err && err.message || 'avslått') + '). Trykk i kartet i stedet.'); }, {enableHighAccuracy: true, timeout: 12000, maximumAge: 60000});
   }
 });
 function alertBox(msg){ const box = document.getElementById('live'); if (box){ const d = document.createElement('div'); d.className = 'alert yellow'; d.innerHTML = '<b>' + esc(msg) + '</b>'; box.prepend(d); setTimeout(() => d.remove(), 7000); } }
@@ -4104,7 +4166,7 @@ $('#q').addEventListener('keydown', e => {
 document.addEventListener('keydown', e => { if (e.key === '/' && document.activeElement !== $('#q') && !/input|select|textarea/i.test(document.activeElement.tagName)){ e.preventDefault(); $('#q').focus(); } });
 render();
 /* lesetilgang for feilsøking og tester (endrer ingenting) */
-window.fg = {maps: () => ({map, map2}), algo: () => AL.res.map(r => ({sp: r.sp, lat: r.lat, lon: r.lon, sc: r.sc, rank: r.rank})), note: () => AL.note, tiles: () => ATC.size, busy: () => AL.busy, run: () => AL.run};
+window.fg = {maps: () => ({map, map2}), algo: () => AL.res.map(r => ({sp: r.sp, lat: r.lat, lon: r.lon, sc: r.sc, rank: r.rank, fe: r.fe})), sund: sundGrid, ppos: k => { const m = PFMAP[k] && PFMAP[k](); return m && m._pf ? profPos(m._pf) : null; }, geo: GEO, note: () => AL.note, tiles: () => ATC.size, busy: () => AL.busy, run: () => AL.run};
 })();
 
 </script>
